@@ -1,0 +1,33 @@
+{
+  "name": "ceitcon",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@emotion/react": "^11.10.6",
+    "@emotion/styled": "^11.10.6",
+    "@mui/icons-material": "^5.11.16",
+    "@mui/material": "^5.12.1",
+    "@scena/react-ruler": "^0.17.1",
+    "@scena/ruler": "^0.18.3",
+    "js2xmlparser": "^5.0.0",
+    "jstoxml": "^3.2.7",
+    "next": "13.3.0",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "react-drag-drop-files": "^2.3.9",
+    "ruler-guides": "^2.1.1",
+    "scss": "^0.2.4",
+    "uuid": "^9.0.0"
+  },
+  "devDependencies": {
+    "sass": "^1.62.0",
+    "sass-loader": "^13.2.2",
+    "webpack": "^5.80.0"
+  }
+}
