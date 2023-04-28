@@ -18,15 +18,15 @@ import {
   TableRow,
   TextField,
 } from "@mui/material";
-import React from "react";
+import React, { Component, useState } from "react";
 import FooterContainer from "../Footer/FooterContainer";
 import HeaderContainer from "../Header/HeaderContainer";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import ModalContainer from "../Common/Modal/ModalPopupContainer";
 import { FileUploader } from "react-drag-drop-files";
 import HighlightOffIcon from "@mui/icons-material/HighlightOff";
-// import styles from "./Main.module.scss";
-// import "./main.scss";
+import { ZoomPan } from "react-zoom-pan/lib.cjs";
+import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 
 const Main = ({
   manageDetails,
@@ -38,6 +38,10 @@ const Main = ({
   handleCreateXML,
   handleOnChangeMainScreen,
   handleManagePopup,
+  handleZoomPanChange,
+  columns,
+  setColumns,
+  onDragEnd,
 }) => {
   const fileTypes = ["JPEG", "PNG", "GIF", "JPG"];
 
@@ -101,6 +105,39 @@ const Main = ({
           />
         </FormControl>
       </>
+    );
+  };
+  const handleImageComponents = (type, provided, snapshot) => {
+    return (
+      <Box
+        ref={provided.innerRef}
+        {...provided.draggableProps}
+        {...provided.dragHandleProps}
+        style={{
+          userSelect: "none",
+          padding: 4,
+          margin: "0 0 8px 0",
+          minHeight: "50px",
+          ...provided.draggableProps.style,
+        }}
+      >
+        <Box className="file-info" dragging={snapshot.isDragging}>
+          {type}
+          <FileUploader
+            multiple={true}
+            handleChange={(e) => handleOnChangeFile(e, index, "upload")}
+            name="file"
+            classes="fileUp"
+            types={fileTypes}
+            style={{
+              padding: "0px",
+              margin: "0px",
+              border: "1px solid #000",
+              width: "100%",
+            }}
+          />
+        </Box>
+      </Box>
     );
   };
   return (
@@ -287,71 +324,67 @@ const Main = ({
               </Button>
             </Box>
           </Grid>
+
           <Grid
-            item
             xs={8}
             style={{
               display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              textAlign: "center",
               boxShadow: "inset 0px 0px 4px 0px #888888",
               overflow: "hidden",
               backgroundColor: "#00000030",
             }}
+            className="middle-screen"
           >
-            <Grid
-              style={{
-                padding:
-                  manageDetails.mainScreenDetails.length > 0 ? "25px" : "0px",
-                width:
-                  manageDetails.resolution === "1920_1080"
-                    ? "55%"
-                    : manageDetails.resolution === "800_600"
-                    ? "50%"
-                    : manageDetails.resolution === "640_480"
-                    ? "40%"
-                    : "30%",
-                display: "inline-flex",
-                flexWrap: "wrap",
-                backgroundColor: "#fff",
-              }}
-            >
-              {manageDetails.mainScreenDetails.length > 0 &&
-                manageDetails.mainScreenDetails.map((info, index) => {
-                  return (
-                    <Grid
-                      key={index}
-                      item
-                      xs={6}
-                      // container
-                      spacing={0}
-                      gap={0}
-                      style={{
-                        padding: "0px",
-                        margin: "0px",
-                      }}
-                    >
-                      {info?.fileObj ? (
-                        <div
-                          className={`file-uploaded`}
-                          style={{
-                            textAlign: index % 2 == 0 ? "end" : "start",
-                          }}
-                        >
-                          <img src={info?.fileObj} className="img-view" />
-                          <HighlightOffIcon
-                            className={`iconInfo ${
-                              index % 2 == 0 ? "right-align" : "left-align"
-                            }`}
-                            onClick={() =>
-                              handleOnChangeFile("", index, "clear")
-                            }
-                          />
-                        </div>
-                      ) : (
-                        <Box className="file-info">
-                          {/* <FormControl
+            <ZoomPan onChange={(e) => handleZoomPanChange(e)}>
+              {/* onSelectItem onChange onAddItem */}
+              <div x={0} y={0} h={0} w={0}></div>
+              <Grid
+                className={`main-screen ${
+                  manageDetails.mainScreenDetails.length > 0 && "bgColorMain"
+                }`}
+                x={225}
+                y={100}
+                h={750}
+                w={750}
+                style={{
+                  padding:
+                    manageDetails.mainScreenDetails.length > 0 ? "25px" : "0px",
+                  height: "100%",
+                  width: "100%",
+                  // manageDetails.resolution === "1920_1080"
+                  //   ? "55%"
+                  //   : manageDetails.resolution === "800_600"
+                  //   ? "50%"
+                  //   : manageDetails.resolution === "640_480"
+                  //   ? "40%"
+                  //   : "30%",
+                  display: "flex",
+                  flexWrap: "wrap",
+                  flexDirection: "row",
+                }}
+              >
+                {manageDetails.mainScreenDetails.length > 0 &&
+                  manageDetails.mainScreenDetails.map((info, index) => {
+                    return (
+                      <Grid key={index} xs={6} className={`file-uploaded-grid`}>
+                        {info?.fileObj ? (
+                          <Box
+                            className={`file-uploaded`}
+                            style={{
+                              textAlign: index % 2 == 0 ? "end" : "start",
+                            }}
+                          >
+                            <img src={info?.fileObj} className="img-view" />
+                            <HighlightOffIcon
+                              className={`iconInfo right-align`}
+                              onClick={() =>
+                                handleOnChangeFile("", index, "clear")
+                              }
+                            />
+                          </Box>
+                        ) : (
+                          <Box className="file-info">
+                            {/* <FormControl
                             fullWidth
                             style={{
                               display: "flex",
@@ -436,32 +469,33 @@ const Main = ({
                               }
                             />
                           </FormControl> */}
-
-                          <FileUploader
-                            multiple={true}
-                            handleChange={(e) =>
-                              handleOnChangeFile(e, index, "upload")
-                            }
-                            name="file"
-                            classes="fileUp"
-                            types={fileTypes}
-                            style={{
-                              padding: "0px",
-                              margin: "0px",
-                              border: "1px solid #000",
-                              width: "100%",
-                            }}
-                          />
-                        </Box>
-                      )}
-                    </Grid>
-                  );
-                })}
-            </Grid>
+                            <FileUploader
+                              multiple={true}
+                              handleChange={(e) =>
+                                handleOnChangeFile(e, index, "upload")
+                              }
+                              name="file"
+                              classes="fileUp"
+                              types={fileTypes}
+                              style={{
+                                padding: "0px",
+                                margin: "0px",
+                                border: "1px solid #000",
+                                width: "100%",
+                              }}
+                            />
+                          </Box>
+                        )}
+                      </Grid>
+                    );
+                  })}
+              </Grid>
+            </ZoomPan>
           </Grid>
+
           <Grid
             item
-            xs={2}
+            xs={3}
             sx={{
               backgroundColor: "#ebf5ff",
               padding: "10px",
@@ -517,6 +551,142 @@ const Main = ({
                   })}
               </TableBody>
             </Table>
+            <DragDropContext
+              onDragEnd={(result) => onDragEnd(result, columns, setColumns)}
+            >
+              <Box key={"leftPanel"} style={{ border: "1px solid #000" }}>
+                Top Section
+                <Box style={{ margin: 2 }}>
+                  <Droppable droppableId={"leftPanel"} key={"leftPanel"}>
+                    {(provided, snapshot) => {
+                      return (
+                        <Box
+                          {...provided.droppableProps}
+                          ref={provided.innerRef}
+                          style={{
+                            padding: 0,
+                            minHeight: "100px",
+                          }}
+                        >
+                          {columns.leftPanel.items.filter(
+                            (item) => item.content === "Image"
+                          ).length > 0 && (
+                            <>
+                              <Draggable key={"1"} draggableId={"1"}>
+                                {(provided, snapshot) => {
+                                  return handleImageComponents(
+                                    "Image",
+                                    provided,
+                                    snapshot
+                                  );
+                                }}
+                              </Draggable>
+                            </>
+                          )}
+                          {columns.leftPanel.items.filter(
+                            (item) => item.content === "Video"
+                          ).length > 0 && (
+                            <>
+                              <Draggable key={"2"} draggableId={"2"}>
+                                {(provided, snapshot) => {
+                                  return handleImageComponents(
+                                    "Video",
+                                    provided,
+                                    snapshot
+                                  );
+                                }}
+                              </Draggable>
+                            </>
+                          )}
+                          {columns.leftPanel.items.filter(
+                            (item) => item.content === "PDF"
+                          ).length > 0 && (
+                            <>
+                              <Draggable key={"3"} draggableId={"3"}>
+                                {(provided, snapshot) => {
+                                  return handleImageComponents(
+                                    "PDF",
+                                    provided,
+                                    snapshot
+                                  );
+                                }}
+                              </Draggable>
+                            </>
+                          )}
+                          {provided.placeholder}
+                        </Box>
+                      );
+                    }}
+                  </Droppable>
+                </Box>
+              </Box>
+              <Box key={"centareScreen"} style={{ border: "1px solid #000" }}>
+                Drop Section
+                <Box style={{ margin: 2 }}>
+                  <Droppable droppableId={"centareScreen"}>
+                    {(provided, snapshot) => {
+                      return (
+                        <Box
+                          {...provided.droppableProps}
+                          ref={provided.innerRef}
+                          style={{
+                            padding: 0,
+                            minHeight: "100px",
+                          }}
+                        >
+                          {columns.centareScreen.items.filter(
+                            (item) => item.content === "Image"
+                          ).length > 0 && (
+                            <>
+                              <Draggable key={"1"} draggableId={"1"}>
+                                {(provided, snapshot) => {
+                                  return handleImageComponents(
+                                    "Image",
+                                    provided,
+                                    snapshot
+                                  );
+                                }}
+                              </Draggable>
+                            </>
+                          )}
+                          {columns.centareScreen.items.filter(
+                            (item) => item.content === "Video"
+                          ).length > 0 && (
+                            <>
+                              <Draggable key={"2"} draggableId={"2"}>
+                                {(provided, snapshot) => {
+                                  return handleImageComponents(
+                                    "Video",
+                                    provided,
+                                    snapshot
+                                  );
+                                }}
+                              </Draggable>
+                            </>
+                          )}
+                          {columns.centareScreen.items.filter(
+                            (item) => item.content === "PDF"
+                          ).length > 0 && (
+                            <>
+                              <Draggable key={"3"} draggableId={"3"}>
+                                {(provided, snapshot) => {
+                                  return handleImageComponents(
+                                    "PDF",
+                                    provided,
+                                    snapshot
+                                  );
+                                }}
+                              </Draggable>
+                            </>
+                          )}
+                          {provided.placeholder}
+                        </Box>
+                      );
+                    }}
+                  </Droppable>
+                </Box>
+              </Box>
+            </DragDropContext>
           </Grid>
         </Grid>
       </Grid>
@@ -531,42 +701,50 @@ const Main = ({
       >
         <FooterContainer />
       </Grid>
-      <ModalContainer
-        modelKey={"resolutionTypePopup"}
-        modalOpen={manageDetails.resolutionTypePopup}
-        modalClose={() =>
-          handleManagePopup(
-            "resolutionTypePopup",
-            !manageDetails.resolutionTypePopup
-          )
-        }
-        modalTitle={"Create Resolution"}
-        modalContent={handleResolutionPopupContent()}
-        modalFirstBtnTitle={"Create"}
-        modalFirstMethod={() => handleCreateResolution()}
-        modalSecondBtnTitle={"Cancel"}
-        modalSecondMethod={() =>
-          handleManagePopup(
-            "resolutionTypePopup",
-            !manageDetails.resolutionTypePopup
-          )
-        }
-      />
-      <ModalContainer
-        modelKey={"monitorTypePopup"}
-        modalOpen={manageDetails.monitorTypePopup}
-        modalClose={() =>
-          handleManagePopup("monitorTypePopup", !manageDetails.monitorTypePopup)
-        }
-        modalTitle={"Create Monitor"}
-        modalContent={handleMonitorPopupContent()}
-        modalFirstBtnTitle={"Create"}
-        modalFirstMethod={() => handleCreateMonitor()}
-        modalSecondBtnTitle={"Cancel"}
-        modalSecondMethod={() =>
-          handleManagePopup("monitorTypePopup", !manageDetails.monitorTypePopup)
-        }
-      />
+      <>
+        <ModalContainer
+          modelKey={"resolutionTypePopup"}
+          modalOpen={manageDetails.resolutionTypePopup}
+          modalClose={() =>
+            handleManagePopup(
+              "resolutionTypePopup",
+              !manageDetails.resolutionTypePopup
+            )
+          }
+          modalTitle={"Create Resolution"}
+          modalContent={handleResolutionPopupContent()}
+          modalFirstBtnTitle={"Create"}
+          modalFirstMethod={() => handleCreateResolution()}
+          modalSecondBtnTitle={"Cancel"}
+          modalSecondMethod={() =>
+            handleManagePopup(
+              "resolutionTypePopup",
+              !manageDetails.resolutionTypePopup
+            )
+          }
+        />
+        <ModalContainer
+          modelKey={"monitorTypePopup"}
+          modalOpen={manageDetails.monitorTypePopup}
+          modalClose={() =>
+            handleManagePopup(
+              "monitorTypePopup",
+              !manageDetails.monitorTypePopup
+            )
+          }
+          modalTitle={"Create Monitor"}
+          modalContent={handleMonitorPopupContent()}
+          modalFirstBtnTitle={"Create"}
+          modalFirstMethod={() => handleCreateMonitor()}
+          modalSecondBtnTitle={"Cancel"}
+          modalSecondMethod={() =>
+            handleManagePopup(
+              "monitorTypePopup",
+              !manageDetails.monitorTypePopup
+            )
+          }
+        />
+      </>
     </Grid>
   );
 };
