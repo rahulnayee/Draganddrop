@@ -16,11 +16,11 @@ export const resolutionType = {
   "640_480": "VGA (640 * 480)",
 };
 export const monitorType = [
-  {
-    id: 1,
-    title: "Only 1",
-    totalScreen: 1,
-  },
+  // {
+  //   id: 1,
+  //   title: "Only 1",
+  //   totalScreen: 1,
+  // },
   {
     id: 2,
     title: "1 * 2",
