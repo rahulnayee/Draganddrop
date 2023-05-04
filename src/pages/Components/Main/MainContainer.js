@@ -12,7 +12,11 @@ const MainContainer = () => {
     nameResolution: "",
     widthResolution: 0,
     heightResolution: 0,
-    monitor: "",
+    monitor: {
+      id: 0,
+      title: "",
+      totalScreen: 0,
+    },
     monitorType: [],
     monitorTypePopup: false,
     monitorSize1: 0,
@@ -22,6 +26,18 @@ const MainContainer = () => {
     angle: "",
     angleType: {},
     mainScreenDetails: [],
+    topPanel: {
+      name: "topPanel",
+      items: [
+        { id: 1, content: "Image", fileObj: null, fileDetails: null },
+        { id: 2, content: "Video", fileObj: null, fileDetails: null },
+        { id: 3, content: "PDF", fileObj: null, fileDetails: null },
+      ],
+    },
+    centareScreen: {
+      name: "centareScreen",
+      items: [],
+    },
     rowScreen: 0,
     columnScreen: 0,
   });
@@ -40,7 +56,6 @@ const MainContainer = () => {
       items: [],
     },
   });
-  
 
   const handleOnChange = (key, value) => {
     setManageDetails({
@@ -119,13 +134,13 @@ const MainContainer = () => {
 
   const handleCreateRegions = () => {
     if (
-      manageDetails.monitor &&
+      manageDetails.monitor.title &&
       manageDetails.resolution &&
       manageDetails.angle
     ) {
       let mainScreenDetails = []; // [...manageDetails.mainScreenDetails];
       let count = manageDetails.monitorType.filter(
-        (item) => item.title === manageDetails.monitor
+        (item) => item.title === manageDetails.monitor.title
       );
       let noOfRow = 0;
       let noOfColumn = 0;
@@ -137,20 +152,22 @@ const MainContainer = () => {
           mainScreenDetails.push({
             id: index,
             fileObj: null,
-            totalDay: 0,
-            hours: 0,
-            minutes: 0,
-            second: 0,
+            drop: false,
+            // totalDay: 0,
+            // hours: 0,
+            // minutes: 0,
+            // second: 0,
           });
         }
       } else {
         mainScreenDetails.push({
           id: 1,
           fileObj: null,
-          totalDay: 0,
-          hours: 0,
-          minutes: 0,
-          second: 0,
+          drop: false,
+          // totalDay: 0,
+          // hours: 0,
+          // minutes: 0,
+          // second: 0,
         });
       }
 
@@ -213,7 +230,7 @@ const MainContainer = () => {
         },
         Monitor: {
           Id: monitorId,
-          Name: manageDetails.monitor,
+          Name: manageDetails.monitor.title,
           Horizontal: 1,
           Vertical: 1,
           IsInitial: "True",
@@ -345,39 +362,35 @@ const MainContainer = () => {
     console.log(e);
   };
 
-  const onDragEnd = (result, columns, setColumns) => {
+  const onDragEndNew = (result) => {
     if (!result.destination) return;
-    const { source, destination } = result;
-
+    const { source, destination, draggableId } = result;
     if (source.droppableId !== destination.droppableId) {
-      const sourceColumn = columns[source.droppableId];
-      const destColumn = columns[destination.droppableId];
-      const sourceItems = [...sourceColumn.items];
-      const destItems = [...destColumn.items];
-      const [removed] = sourceItems.splice(source.index, 1);
-      destItems.splice(destination.index, 0, removed);
-      setColumns({
-        ...columns,
-        [source.droppableId]: {
-          ...sourceColumn,
-          items: sourceItems,
-        },
-        [destination.droppableId]: {
-          ...destColumn,
-          items: destItems,
-        },
-      });
-    } else {
-      const column = columns[source.droppableId];
-      const copiedItems = [...column.items];
-      const [removed] = copiedItems.splice(source.index, 1);
-      copiedItems.splice(destination.index, 0, removed);
-      setColumns({
-        ...columns,
-        [source.droppableId]: {
-          ...column,
-          items: copiedItems,
-        },
+      let allItem = [...manageDetails.mainScreenDetails];
+      let type = "";
+      if (draggableId === "1") {
+        type = "Image";
+      } else if (draggableId === "2") {
+        type = "Video";
+      } else if (draggableId === "3") {
+        type = "PDF";
+      } else {
+      }
+      let id = 1;
+      if (allItem.length >= 1) id = allItem.length + 1;
+      let dragItem = {
+        id: id,
+        content: type,
+        fileDetails: null,
+        fileObj: null,
+        drop: true,
+      };
+
+      allItem.push({ ...dragItem });
+
+      setManageDetails({
+        ...manageDetails,
+        mainScreenDetails: allItem,
       });
     }
   };
@@ -405,7 +418,7 @@ const MainContainer = () => {
       handleZoomPanChange={handleZoomPanChange}
       columns={columns}
       setColumns={setColumns}
-      onDragEnd={onDragEnd}
+      onDragEndNew={onDragEndNew}
     />
   );
 };
