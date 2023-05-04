@@ -1,16 +1,31 @@
+.kvfysmfp {
+  width: 100%;
+}
 .fileUp {
-  /* max-width: 100% !important;
-  min-width: auto !important; */
-  border: solid 2px #0658c2 !important;
+  max-width: auto !important;
+  min-width: auto !important;
+  border: solid 1px #0658c2 !important;
   border-radius: 0px !important;
   height: 100% !important;
   width: 100% !important;
   padding: 0px !important;
 }
-
+.fileUp > svg {
+  width: 14px !important;
+  height: 14px !important;
+}
+.file-types {
+  font-size: 5px !important;
+}
+.cgTcOH {
+  font-size: 5px !important;
+}
 .file-info {
   width: 100%;
   height: 100%;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
 }
 
 .img-view {
@@ -44,18 +59,13 @@
   position: absolute;
   top: 0px;
   right: 0px;
+  width: 15px;
+  height: 15px;
 }
 .left-align {
   position: absolute;
   top: 0px;
   left: 0px;
-}
-.main-screen {
-  display: "flex";
-  justify-content: "space-between";
-  flex-direction: column;
-
-  /* height: "950px"; */
 }
 
 .left-panel {
@@ -83,13 +93,79 @@
 .file-uploaded-grid {
   padding: 0px;
   margin: 0px;
+  /* width: 100%;
+  height: auto; */
+  /* border: 1px solid #000; */
   width: 100%;
-  height: auto;
+  max-width: 100% !important;
+  height: 100%;
 }
 
 .bgColorMain {
-  background-color: #ffffff;
+  background-color: #add8e6;
+  padding: 5px;
 }
 
-.draggable-main {
+.zooming-content {
+  font-family: sans-serif;
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
 }
+
+.img-viewer {
+  position: relative;
+  flex-grow: 1;
+  align-self: center;
+  height: 0;
+  width: 80%;
+  cursor: grab;
+  border: 2px solid red;
+}
+.img-viewer > div {
+  height: 100%;
+}
+
+.movable-table {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.overlay {
+  background-color: #ffe7ab2b;
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+.zooming-content {
+  width: inherit;
+}
+
+.horizontal-angle {
+  width: 65%;
+  height: 35%;
+}
+.vertical-angle {
+  width: 35%;
+  height: 65%;
+}
+.droppable-top-penal {
+  min-height: 60px;
+  max-height: 60px;
+}
+.top-penal {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  align-items: center;
+  min-height: 60px;
+  max-height: 60px;
+}
+/* 
+#band #viewport div:first-child {
+  transform: matrix(1, 0, 0, 1, 0, 0) !important;
+} */

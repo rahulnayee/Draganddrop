@@ -162,8 +162,9 @@ const Main = ({
     "56037265-88219f00-5d37-11e9-95ef-9cb24be0190e.png";
   const imgRef = useRef();
   const containerRef = useRef();
+  // containerRef?.current?.style.setProperty("width", "100%");
 
-  const onUpdate = useCallback(({ x, y, scale }) => {
+  const onUpdate = useCallback(({ x = 1, y = 1, scale = 1 }) => {
     const { current: img } = imgRef;
     if (img) {
       const value = make3dTransformValue({ x, y, scale });
@@ -225,11 +226,11 @@ const Main = ({
                     />
                   </InputLabel>
                   <FormControl fullWidth>
-                    {/* <InputLabel id="resolution-label">Resolution</InputLabel> */}
+                    <InputLabel id="resolution-label">Resolution</InputLabel>
                     <Select
                       labelId="resolution-label"
                       id="resolution-id"
-                      // label="Resolution"
+                      label="Resolution"
                       value={manageDetails.resolution}
                       onChange={(e) =>
                         handleOnChange(e.target.name, e.target.value)
@@ -270,11 +271,11 @@ const Main = ({
                     />
                   </InputLabel>
                   <FormControl fullWidth>
-                    {/* <InputLabel id="monitor-label">Monitor</InputLabel> */}
+                    <InputLabel id="monitor-label">Monitor</InputLabel>
                     <Select
                       labelId="monitor-label"
                       id="monitor-id"
-                      // label="Monitor"
+                      label="Monitor"
                       value={manageDetails.monitor}
                       onChange={(e) =>
                         handleOnChange(e.target.name, e.target.value)
@@ -284,7 +285,7 @@ const Main = ({
                       {manageDetails.monitorType.length > 0 &&
                         manageDetails.monitorType.map((item, index) => {
                           return (
-                            <MenuItem key={index} value={item}>
+                            <MenuItem key={index} value={item.title}>
                               {item.title}
                             </MenuItem>
                           );
@@ -304,10 +305,10 @@ const Main = ({
                     Please Select Angle
                   </InputLabel>
                   <FormControl fullWidth>
-                    {/* <InputLabel id="angle-label">Angle</InputLabel> */}
+                    <InputLabel id="angle-label">Angle</InputLabel>
                     <Select
                       id="angle-id"
-                      // label="angle"
+                      label="angle"
                       name="angle"
                       labelId="angle-label"
                       value={manageDetails.angle}
@@ -357,30 +358,32 @@ const Main = ({
           </Grid>
           <DragDropContext onDragEnd={(result) => onDragEndNew(result)}>
             <Grid
-              item
               xs={8}
               style={{
                 display: "flex",
                 flexDirection: "column",
               }}
             >
-              <Grid
-                item
-                style={{
-                  minHeight: "60px",
-                  maxHeight: "60px",
-                  boxShadow: "0px 2px 8px 0px #888889",
-                }}
-              >
+              <Grid item style={{ minHeight: "60px", maxHeight: "60px" }}>
                 <Droppable
                   droppableId={"topPanel"}
-                  className={"droppable-top-penal"}
+                  key={"topPanel"}
+                  style={{ minHeight: "60px", maxHeight: "60px" }}
                 >
                   {(provided, snapshot) => {
                     return (
                       <Box {...provided.droppableProps} ref={provided.innerRef}>
-                        <Box className={"top-penal"}>
-                          <Draggable key={1} draggableId={"1"} index={1}>
+                        <Box
+                          style={{
+                            display: "flex",
+                            flexDirection: "row",
+                            justifyContent: "space-around",
+                            alignItems: "center",
+                            minHeight: "60px",
+                            maxHeight: "60px",
+                          }}
+                        >
+                          <Draggable key={"1"} draggableId={"1"}>
                             {(provided, snapshot) => {
                               return (
                                 <Box
@@ -403,7 +406,7 @@ const Main = ({
                               );
                             }}
                           </Draggable>
-                          <Draggable key={2} draggableId={"2"} index={2}>
+                          <Draggable key={"2"} draggableId={"2"}>
                             {(provided, snapshot) => {
                               return (
                                 <Box
@@ -422,7 +425,7 @@ const Main = ({
                               );
                             }}
                           </Draggable>
-                          <Draggable key={3} draggableId={"3"} index={3}>
+                          <Draggable key={"3"} draggableId={"3"}>
                             {(provided, snapshot) => {
                               return (
                                 <Box
@@ -441,7 +444,7 @@ const Main = ({
                               );
                             }}
                           </Draggable>
-                          <Draggable key={4} draggableId={"4"} index={4}>
+                          <Draggable key={"4"} draggableId={"4"}>
                             {(provided, snapshot) => {
                               return (
                                 <Box
@@ -460,7 +463,7 @@ const Main = ({
                               );
                             }}
                           </Draggable>
-                          <Draggable key={5} draggableId={"5"} index={5}>
+                          <Draggable key={"5"} draggableId={"5"}>
                             {(provided, snapshot) => {
                               return (
                                 <Box
@@ -486,41 +489,120 @@ const Main = ({
                   }}
                 </Droppable>
               </Grid>
+              <Grid
+                item
+                xs={12}
+                style={{
+                  // display: "flex",
+                  // boxShadow: "inset 0px 0px 4px 0px #888888",
+                  // overflow: "hidden",
+                  // backgroundColor: "#00000030",
 
-              <Box className="zooming-content">
+                  position: "relative",
+                  flexGrow: 1,
+                  alignSelf: "center",
+                  height: 0,
+                  width: "80%",
+                  cursor: "grab",
+                  border: "2px solid red",
+                }}
+                className="middle-screen"
+              >
                 {manageDetails.mainScreenDetails.length > 0 && (
+                  // <ZoomPan onChange={(e) => handleZoomPanChange(e)}>
+                  // onSelectItem onChange onAddItem
+                  // <div x={0} y={0} h={0} w={0}></div>
+
                   <QuickPinchZoom
                     ref={containerRef}
                     onUpdate={onUpdate}
                     inertia={false}
                     animationDuration={1000}
-                    maxZoom={5}
-                    minZoom={0.5}
+                    maxZoom={20}
+                    minZoom={0.1}
                     wheelScaleFactor={1000}
                   >
-                    <Box
-                      className="movable-table"
-                      style={{
-                        width: "50%",
-                        height: "50%",
-                      }}
-                      ref={imgRef}
-                    >
+                    {/* <Box style={{ width: "100%", height: "100%" }}> */}
+                    <Box style={{ height: "1080px", width: "1920px" }}>
                       <Grid
                         ref={imgRef}
-                        style={{ position: "relative" }}
-                        className={`main-screen bgColorMain ${
-                          manageDetails.angle === "0"
-                            ? "horizontal-angle"
-                            : manageDetails.angle === "180"
-                            ? "horizontal-angle"
-                            : manageDetails.angle === "90"
-                            ? "vertical-angle"
-                            : manageDetails.angle === "270"
-                            ? "vertical-angle"
-                            : ""
+                        style={{
+                          height: "100%",
+                          width: "100%",
+                          // display: "flex",
+                          // flexWrap: "wrap",
+                          // flexDirection: "row",
+                          padding:
+                            manageDetails.mainScreenDetails.length > 0
+                              ? "25px"
+                              : "0px",
+                        }}
+                        className={`main-screen ${
+                          manageDetails.mainScreenDetails.length > 0 &&
+                          "bgColorMain"
                         }`}
+                        // x={190}
+                        // y={80}
+                        // h={
+                        //   manageDetails.resolution === "1920_1080"
+                        //     ? 800
+                        //     : manageDetails.resolution === "800_600"
+                        //     ? 650
+                        //     : manageDetails.resolution === "640_480"
+                        //     ? 550
+                        //     : 750
+                        // }
+                        // w={
+                        //   manageDetails.resolution === "1920_1080"
+                        //     ? 800
+                        //     : manageDetails.resolution === "800_600"
+                        //     ? 650
+                        //     : manageDetails.resolution === "640_480"
+                        //     ? 550
+                        //     : 750
+                        // }
                       >
+                        {/* {manageDetails.mainScreenDetails.length > 0 &&
+                  manageDetails.mainScreenDetails.map((info, index) => {
+                    return (
+                      <Grid key={index} xs={6} className={`file-uploaded-grid`}>
+                        {info?.fileObj ? (
+                          <Box
+                            className={`file-uploaded`}
+                            style={{
+                              textAlign: index % 2 == 0 ? "end" : "start",
+                            }}
+                          >
+                            <img src={info?.fileObj} className="img-view" />
+                            <HighlightOffIcon
+                              className={`iconInfo right-align`}
+                              onClick={() =>
+                                handleOnChangeFile("", index, "clear")
+                              }
+                            />
+                          </Box>
+                        ) : (
+                          <Box className="file-info">
+                            <FileUploader
+                              multiple={true}
+                              handleChange={(e) =>
+                                handleOnChangeFile(e, index, "upload")
+                              }
+                              name="file"
+                              classes="fileUp"
+                              types={fileTypes}
+                              style={{
+                                padding: "0px",
+                                margin: "0px",
+                                border: "1px solid #000",
+                                width: "100%",
+                              }}
+                            />
+                          </Box>
+                        )}
+                      </Grid>
+                    );
+                  })} */}
                         <Droppable droppableId={"centareScreen"}>
                           {(provided, snapshot) => {
                             return (
@@ -529,15 +611,11 @@ const Main = ({
                                 ref={provided.innerRef}
                                 style={{
                                   padding: 0,
-                                  backgroundColor: "#d9f7ff",
+                                  backgroundColor: "pink",
                                   width: "100%",
                                   height: "100%",
-                                  display: "flex",
-                                  flexWrap: "wrap",
-                                  alignContent: "space-around",
-                                  justifyContent: "center",
-                                  alignItems: "stretch",
                                 }}
+                                className="main-screen"
                               >
                                 {manageDetails.mainScreenDetails.length > 0 &&
                                   manageDetails.mainScreenDetails.map(
@@ -549,101 +627,84 @@ const Main = ({
                                             xs={6}
                                             className={`file-uploaded-grid`}
                                           >
-                                            {info?.fileObj ? (
-                                              <Box
-                                                x={800}
-                                                y={50}
-                                                w={200}
-                                                h={50}
-                                                className={`file-uploaded`}
-                                                style={{
-                                                  textAlign:
-                                                    index % 2 == 0
-                                                      ? "end"
-                                                      : "start",
-                                                }}
-                                              >
-                                                <img
-                                                  src={info?.fileObj}
-                                                  className="img-view"
-                                                />
-                                                <HighlightOffIcon
-                                                  className={`iconInfo right-align`}
-                                                  onClick={() =>
-                                                    handleOnChangeFile(
-                                                      "",
-                                                      index,
-                                                      "clear"
-                                                    )
-                                                  }
-                                                />
-                                              </Box>
-                                            ) : (
-                                              <Box className="file-info">
-                                                <FileUploader
-                                                  multiple={true}
-                                                  handleChange={(e) =>
-                                                    handleOnChangeFile(
-                                                      e,
-                                                      index,
-                                                      "upload"
-                                                    )
-                                                  }
-                                                  name="file"
-                                                  classes="fileUp"
-                                                  types={fileTypes}
+                                            <Resizable
+                                              style={{
+                                                display: "flex",
+                                                alignItems: "center",
+                                                justifyContent: "center",
+                                                border: "solid 1px #ddd",
+                                                background: "#f0f0f0",
+                                              }}
+                                              defaultSize={{
+                                                width: "100%",
+                                                height: "100%",
+                                              }}
+                                            >
+                                              {info?.fileObj ? (
+                                                <Box
+                                                  className={`file-uploaded`}
                                                   style={{
-                                                    padding: "0px",
-                                                    margin: "0px",
-                                                    border: "1px solid #000",
-                                                    width: "100%",
+                                                    textAlign:
+                                                      index % 2 == 0
+                                                        ? "end"
+                                                        : "start",
                                                   }}
-                                                />
-                                              </Box>
-                                            )}
+                                                >
+                                                  <img
+                                                    src={info?.fileObj}
+                                                    className="img-view"
+                                                  />
+                                                  <HighlightOffIcon
+                                                    className={`iconInfo right-align`}
+                                                    onClick={() =>
+                                                      handleOnChangeFile(
+                                                        "",
+                                                        index,
+                                                        "clear"
+                                                      )
+                                                    }
+                                                  />
+                                                </Box>
+                                              ) : (
+                                                <Box className="file-info">
+                                                  <FileUploader
+                                                    multiple={true}
+                                                    handleChange={(e) =>
+                                                      handleOnChangeFile(
+                                                        e,
+                                                        index,
+                                                        "upload"
+                                                      )
+                                                    }
+                                                    name="file"
+                                                    classes="fileUp"
+                                                    types={fileTypes}
+                                                    style={{
+                                                      padding: "0px",
+                                                      margin: "0px",
+                                                      border: "1px solid #000",
+                                                      width: "100%",
+                                                    }}
+                                                  />
+                                                </Box>
+                                              )}
+                                            </Resizable>
                                           </Grid>
                                         );
                                       }
                                     }
                                   )}
-
                                 {provided.placeholder}
                               </Box>
                             );
                           }}
                         </Droppable>
-                        {manageDetails.monitorType.filter}
-                        {manageDetails.monitor?.totalScreen === 4 && (
-                          <div
-                            style={{
-                              height: "1px",
-                              width: "100%",
-                              backgroundColor: "red",
-                              top: "50%",
-                              left: 0,
-                              position: "absolute",
-                            }}
-                          ></div>
-                        )}
-                        {[2, 4].includes(
-                          manageDetails.monitor?.totalScreen
-                        ) && (
-                          <div
-                            style={{
-                              height: "100%",
-                              width: "1px",
-                              backgroundColor: "red",
-                              left: "50%",
-                              top: 0,
-                              position: "absolute",
-                            }}
-                          ></div>
-                        )}
                       </Grid>
                     </Box>
                   </QuickPinchZoom>
+                  // </ZoomPan>
                 )}
-              </Box>
+              </Grid>
             </Grid>
             <Grid
               item
@@ -814,9 +875,7 @@ const Main = ({
                   </TableRow>
                   <TableRow>
                     <TableCell>Monitor</TableCell>
-                    <TableCell colSpan={2}>
-                      {manageDetails.monitor?.title}
-                    </TableCell>
+                    <TableCell colSpan={2}>{manageDetails.monitor}</TableCell>
                   </TableRow>
                   <TableRow>
                     <TableCell>Angle</TableCell>
