@@ -15,6 +15,26 @@ export const resolutionType = {
   "800_600": "SVGA (800 * 600)",
   "640_480": "VGA (640 * 480)",
 };
+export const resolutionTypeNew = [
+  {
+    key: "1920_1080",
+    value: "FullHD (1920 * 1080)",
+    width: 1920,
+    height: 1080,
+  },
+  {
+    key: "800_600",
+    value: "SVGA (800 * 600)",
+    width: 800,
+    height: 600,
+  },
+  {
+    key: "640_480",
+    value: "VGA (640 * 480)",
+    width: 640,
+    height: 480,
+  },
+];
 export const monitorType = [
   // {
   //   id: 1,

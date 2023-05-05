@@ -1,6 +1,11 @@
 import React, { useEffect, useState } from "react";
 import Main from "./Main";
-import { angleType, monitorType, resolutionType } from "@/Assets/comman/common";
+import {
+  angleType,
+  monitorType,
+  resolutionType,
+  resolutionTypeNew,
+} from "@/Assets/comman/common";
 import { v4 as uuidv4 } from "uuid";
 import { toXML } from "jstoxml";
 
@@ -25,6 +30,7 @@ const MainContainer = () => {
     screenMonitor2: 0,
     angle: "",
     angleType: {},
+    createRegions: false,
     mainScreenDetails: [],
     topPanel: {
       name: "topPanel",
@@ -38,24 +44,9 @@ const MainContainer = () => {
       name: "centareScreen",
       items: [],
     },
-    rowScreen: 0,
-    columnScreen: 0,
   });
-
-  const [columns, setColumns] = useState({
-    leftPanel: {
-      name: "leftPanel",
-      items: [
-        { id: "1", content: "Image" },
-        { id: "2", content: "Video" },
-        { id: "3", content: "PDF" },
-      ],
-    },
-    centareScreen: {
-      name: "centareScreen",
-      items: [],
-    },
-  });
+  const defaultHeight = 350;
+  const defaultWidth = 350;
 
   const handleOnChange = (key, value) => {
     setManageDetails({
@@ -84,10 +75,14 @@ const MainContainer = () => {
   };
 
   const handleCreateResolution = () => {
-    let resolutionInfo = { ...manageDetails.resolutionType };
-    resolutionInfo[
-      `${manageDetails.widthResolution}_${manageDetails.heightResolution}`
-    ] = `${manageDetails.nameResolution} (${manageDetails.widthResolution} * ${manageDetails.heightResolution})`;
+    let resolutionInfo = [...manageDetails.resolutionType];
+
+    resolutionInfo.push({
+      key: `${manageDetails.widthResolution}_${manageDetails.heightResolution}`,
+      value: `${manageDetails.nameResolution} (${manageDetails.widthResolution} * ${manageDetails.heightResolution})`,
+      width: manageDetails.widthResolution,
+      height: manageDetails.heightResolution,
+    });
 
     setManageDetails({
       ...manageDetails,
@@ -138,73 +133,41 @@ const MainContainer = () => {
       manageDetails.resolution &&
       manageDetails.angle
     ) {
-      let mainScreenDetails = []; // [...manageDetails.mainScreenDetails];
-      let count = manageDetails.monitorType.filter(
-        (item) => item.title === manageDetails.monitor.title
-      );
-      let noOfRow = 0;
-      let noOfColumn = 0;
-      if (count.length > 0) {
-        let rowAndColInfo = count[0].title.split(" ");
-        noOfRow = parseInt(rowAndColInfo[0]);
-        noOfColumn = parseInt(rowAndColInfo[2]);
-        for (let index = 0; index < count[0].totalScreen; index++) {
-          mainScreenDetails.push({
-            id: index,
-            fileObj: null,
-            drop: false,
-            // totalDay: 0,
-            // hours: 0,
-            // minutes: 0,
-            // second: 0,
-          });
-        }
-      } else {
-        mainScreenDetails.push({
-          id: 1,
-          fileObj: null,
-          drop: false,
-          // totalDay: 0,
-          // hours: 0,
-          // minutes: 0,
-          // second: 0,
-        });
-      }
+      // let mainScreenDetails = []; // [...manageDetails.mainScreenDetails];
+      // let count = manageDetails.monitorType.filter(
+      //   (item) => item.title === manageDetails.monitor.title
+      // );
+      // if (count.length > 0) {
+      //   for (let index = 0; index < count[0].totalScreen; index++) {
+      //     mainScreenDetails.push({
+      //       id: index,
+      //       fileObj: null,
+      //       drop: false,
+      //     });
+      //   }
+      // } else {
+      //   mainScreenDetails.push({
+      //     id: 1,
+      //     fileObj: null,
+      //     drop: false,
+      //   });
+      // }
 
       setManageDetails({
         ...manageDetails,
-        mainScreenDetails: mainScreenDetails,
-        rowScreen: noOfRow,
-        columnScreen: noOfColumn,
+        // mainScreenDetails: mainScreenDetails,
+        createRegions: true,
       });
     } else {
       alert("please select Region info....");
     }
   };
 
-  const handleOnChangeMainScreen = (key, val, index) => {
-    let mainScreenDetails = [...manageDetails.mainScreenDetails];
-    if (key === "hours" && parseInt(val) >= 25) {
-      mainScreenDetails[index].hours = 24;
-    } else if (key === "minutes" && parseInt(val) >= 61) {
-      mainScreenDetails[index].minutes = 60;
-    } else if (key === "second" && parseInt(val) >= 61) {
-      mainScreenDetails[index].second = 60;
-    } else {
-      mainScreenDetails[index][key] = val;
-    }
-
-    setManageDetails({
-      ...manageDetails,
-      mainScreenDetails: mainScreenDetails,
-    });
-  };
-
   const handleCreateXML = () => {
     let projectId = uuidv4();
     let resolutionId = uuidv4();
-    let resolutionWidth = manageDetails.resolution.split("_")[0];
-    let resolutionHeight = manageDetails.resolution.split("_")[1];
+    let resolutionWidth = manageDetails.resolution.width;
+    let resolutionHeight = manageDetails.resolution.height;
     let monitorId = uuidv4();
     let regionId = uuidv4();
     let slideId = uuidv4();
@@ -223,7 +186,7 @@ const MainContainer = () => {
         },
         Resolution: {
           Id: resolutionId,
-          Name: manageDetails.resolutionType[manageDetails.resolution],
+          Name: manageDetails.resolution.value,
           Width: resolutionWidth,
           Height: resolutionHeight,
           IsInitial: "True",
@@ -231,8 +194,8 @@ const MainContainer = () => {
         Monitor: {
           Id: monitorId,
           Name: manageDetails.monitor.title,
-          Horizontal: 1,
-          Vertical: 1,
+          Horizontal: manageDetails.monitor.title.split(" ")[0],
+          Vertical: manageDetails.monitor.title.split(" ")[2],
           IsInitial: "True",
         },
         Orientation: manageDetails.angle,
@@ -258,13 +221,7 @@ const MainContainer = () => {
                       ZIndex: 1,
                       IsVisible: "True",
                       IsLocked: "False",
-                      Controls: {
-                        _name: "Control",
-                        _attrs: {
-                          Type: "Image",
-                        },
-                        _content: [],
-                      },
+                      Controls: [],
                     },
                   },
                 },
@@ -291,10 +248,10 @@ const MainContainer = () => {
       let details = {
         Id: imgId,
         Name: "Image_" + imgId.substring(0, 6),
-        Width: 725.714285714286,
-        Height: 762.857142857143,
-        X: 0,
-        Y: 0,
+        Width: manageDetails.mainScreenDetails[index].width,
+        Height: manageDetails.mainScreenDetails[index].height,
+        X: manageDetails.mainScreenDetails[index].distance[0],
+        Y: manageDetails.mainScreenDetails[index].distance[1],
         Margion: "0,0,640.285714285714,5.14285714285711",
         Opacity: 1,
         Background: "",
@@ -336,12 +293,23 @@ const MainContainer = () => {
           },
         },
       };
-      objDetails?.push(details);
+      objDetails?.push({
+        _name: "Control",
+        _attrs: {
+          Type: "Image",
+        },
+        _content: [details],
+      });
+      // objDetails?.push({ Control: details });
     }
 
-    mainJSON?.Project?.Regions?.Region?.Slides?.Slide[0]?.Layers?.Layer?.Controls?._content?.push(
+    mainJSON?.Project?.Regions?.Region?.Slides?.Slide[0]?.Layers?.Layer?.Controls?.push(
       objDetails
     );
+
+    // mainJSON?.Project?.Regions?.Region?.Slides?.Slide[0]?.Layers?.Layer?.Controls?._content?.push(
+    //   objDetails
+    // );
     //JSON to XML output
     let XMLFile = toXML(mainJSON, { header: true, indent: "    " });
     //download XML file
@@ -358,13 +326,10 @@ const MainContainer = () => {
     window.URL.revokeObjectURL(url);
   };
 
-  const handleZoomPanChange = (e) => {
-    console.log(e);
-  };
-
-  const onDragEndNew = (result) => {
+  const onDragEnd = (result) => {
     if (!result.destination) return;
     const { source, destination, draggableId } = result;
+
     if (source.droppableId !== destination.droppableId) {
       let allItem = [...manageDetails.mainScreenDetails];
       let type = "";
@@ -376,16 +341,20 @@ const MainContainer = () => {
         type = "PDF";
       } else {
       }
+
       let id = 1;
       if (allItem.length >= 1) id = allItem.length + 1;
+
       let dragItem = {
         id: id,
         content: type,
         fileDetails: null,
         fileObj: null,
         drop: true,
+        distance: [0, 0],
+        height: defaultHeight,
+        width: defaultWidth,
       };
-
       allItem.push({ ...dragItem });
 
       setManageDetails({
@@ -394,11 +363,22 @@ const MainContainer = () => {
       });
     }
   };
+  const handleSaveXAndYAxis = (
+    index,
+    data = { distance: [], width: 0, height: 0 }
+  ) => {
+    let dragScreen = [...manageDetails.mainScreenDetails];
+    dragScreen[index] = { ...dragScreen[index], ...data };
+    setManageDetails({
+      ...manageDetails,
+      mainScreenDetails: dragScreen,
+    });
+  };
 
   useEffect(() => {
     setManageDetails({
       ...manageDetails,
-      resolutionType: resolutionType,
+      resolutionType: resolutionTypeNew,
       monitorType: monitorType,
       angleType: angleType,
     });
@@ -413,12 +393,9 @@ const MainContainer = () => {
       handleOnChangeFile={handleOnChangeFile}
       handleCreateRegions={handleCreateRegions}
       handleCreateXML={handleCreateXML}
-      handleOnChangeMainScreen={handleOnChangeMainScreen}
       handleManagePopup={handleManagePopup}
-      handleZoomPanChange={handleZoomPanChange}
-      columns={columns}
-      setColumns={setColumns}
-      onDragEndNew={onDragEndNew}
+      onDragEnd={onDragEnd}
+      handleSaveXAndYAxis={handleSaveXAndYAxis}
     />
   );
 };
