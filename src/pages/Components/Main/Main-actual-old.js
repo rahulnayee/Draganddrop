@@ -18,7 +18,13 @@ import {
   TableRow,
   TextField,
 } from "@mui/material";
-import React, { useEffect, useRef } from "react";
+import React, {
+  Component,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import FooterContainer from "../Footer/FooterContainer";
 import HeaderContainer from "../Header/HeaderContainer";
 import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate";
@@ -32,7 +38,8 @@ import { FileUploader } from "react-drag-drop-files";
 import HighlightOffIcon from "@mui/icons-material/HighlightOff";
 import { ZoomPan } from "react-zoom-pan/lib.cjs";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
-import Moveable from "react-moveable-fork";
+import { Resizable } from "re-resizable";
+import QuickPinchZoom, { make3dTransformValue } from "react-quick-pinch-zoom";
 
 const Main = ({
   manageDetails,
@@ -42,12 +49,14 @@ const Main = ({
   handleOnChangeFile,
   handleCreateRegions,
   handleCreateXML,
+  handleOnChangeMainScreen,
   handleManagePopup,
-  onDragEnd,
-  handleSaveXAndYAxis,
+  handleZoomPanChange,
+  columns,
+  setColumns,
+  onDragEndNew,
 }) => {
   const fileTypes = ["JPEG", "PNG", "GIF", "JPG"];
-  const zoomingContent = useRef();
 
   const handleResolutionPopupContent = () => {
     return (
@@ -148,8 +157,19 @@ const Main = ({
       </Box>
     );
   };
+  const imgUrl =
+    "https://user-images.githubusercontent.com/4661784/" +
+    "56037265-88219f00-5d37-11e9-95ef-9cb24be0190e.png";
+  const imgRef = useRef();
+  const containerRef = useRef();
 
-  const moveableRef = useRef();
+  const onUpdate = useCallback(({ x, y, scale }) => {
+    const { current: img } = imgRef;
+    if (img) {
+      const value = make3dTransformValue({ x, y, scale });
+      img.style.setProperty("transform", value);
+    }
+  }, []);
 
   useEffect(() => {
     const div = document.getElementById("band");
@@ -218,23 +238,27 @@ const Main = ({
                     />
                   </InputLabel>
                   <FormControl fullWidth>
+                    {/* <InputLabel id="resolution-label">Resolution</InputLabel> */}
                     <Select
                       labelId="resolution-label"
                       id="resolution-id"
+                      // label="Resolution"
                       value={manageDetails.resolution}
                       onChange={(e) =>
                         handleOnChange(e.target.name, e.target.value)
                       }
                       name={"resolution"}
                     >
-                      {manageDetails.resolutionType.length > 0 &&
-                        manageDetails.resolutionType.map((item, index) => {
-                          return (
-                            <MenuItem key={index} value={item}>
-                              {manageDetails.resolutionType[index].value}
-                            </MenuItem>
-                          );
-                        })}
+                      {Object.keys(manageDetails.resolutionType).length > 0 &&
+                        Object.keys(manageDetails.resolutionType).map(
+                          (item, index) => {
+                            return (
+                              <MenuItem key={index} value={item}>
+                                {manageDetails.resolutionType[item]}
+                              </MenuItem>
+                            );
+                          }
+                        )}
                     </Select>
                   </FormControl>
                 </Grid>
@@ -344,7 +368,7 @@ const Main = ({
               </Button>
             </Box>
           </Grid>
-          <DragDropContext onDragEnd={(result) => onDragEnd(result)}>
+          <DragDropContext onDragEnd={(result) => onDragEndNew(result)}>
             <Grid
               item
               xs={8}
@@ -475,191 +499,193 @@ const Main = ({
                   }}
                 </Droppable>
               </Grid>
-
               <Box className="zooming-content">
-                {/* *******************************  EDITOR SECTION START HERE  ********************************* */}
-                {manageDetails.createRegions && (
-                  <div
-                    ref={zoomingContent}
-                    style={{
-                      backgroundColor: "#c4c4c4e3",
-                      height: "100%",
-                      width: "100%",
-                    }}
-                  >
-                    <ZoomPan>
-                      <div x={0} y={0} h={0} w={0} className="chickenyu"></div>
-                      <div
-                        className="testing"
-                        x={0}
-                        y={0}
-                        w={manageDetails.resolution?.width}
-                        h={manageDetails.resolution?.height}
-                        id="band"
-                        onMouseDown={(e) => {
-                          e.stopPropagation();
+                {manageDetails.mainScreenDetails.length > 0 && (
+                  <ZoomPan>
+                    <div x={0} y={0} h={0}></div>
+                    <Box
+                      className="testing"
+                      style={{
+                        // backgroundColor: "blue",
+                        width: "100%",
+                        height: "100%",
+                      }}
+                      id="band"
+                      onMouseDown={(e) => {
+                        console.log("=============================");
+                        e.stopPropagation();
+                      }}
+                      onMouseMove={(e) => {
+                        const rubberband =
+                          document.getElementById("Rubberband");
+                        const div0 = document.querySelector(
+                          "#band #viewport div:first-child"
+                        );
+                        if (div0) {
+                          div0.style.transform = "matrix(1, 0, 0, 1, 0, 0)";
+                        }
+                        if (rubberband) {
+                          rubberband.setAttribute(
+                            "transform",
+                            "matrix(1, 0, 0, 1, 0, 0)"
+                          );
+                        }
+                      }}
+                      // className="movable-table"
+                      // style={{
+                      //   width: "50%",
+                      //   height: "50%",
+                      // }}
+                      ref={imgRef}
+                    >
+                      <Grid
+                        ref={imgRef}
+                        style={{
+                          position: "relative",
+                          width: "fit-content",
+                          height: "fit-content",
+                          backgroundColor: "#add8e6",
                         }}
+                        // className={`main-screen bgColorMain ${
+                        //   manageDetails.angle === "0"
+                        //     ? "horizontal-angle"
+                        //     : manageDetails.angle === "180"
+                        //     ? "horizontal-angle"
+                        //     : manageDetails.angle === "90"
+                        //     ? "vertical-angle"
+                        //     : manageDetails.angle === "270"
+                        //     ? "vertical-angle"
+                        //     : ""
+                        // }`}
                       >
                         <Droppable droppableId={"centareScreen"}>
                           {(provided, snapshot) => {
                             return (
-                              <div
+                              <Box
                                 {...provided.droppableProps}
                                 ref={provided.innerRef}
                                 style={{
+                                  // padding: 0,
                                   backgroundColor: "#d9f7ff",
-                                  width: manageDetails.resolution?.width + "px",
-                                  height:
-                                    manageDetails.resolution?.height + "px",
+                                  width: "1920px",
+                                  height: "1080px",
+                                  // display: "flex",
+                                  // flexWrap: "wrap",
+                                  // alignContent: "space-around",
+                                  // justifyContent: "center",
+                                  // alignItems: "stretch",
                                 }}
+                                className={
+                                  "11111111111111111111111111111111111111111111111111111111111"
+                                }
                               >
-                                {/**************************** ACTUAL DROP CONTENT WILL BE GOES HERE ***********************************/}
-
-                                {manageDetails.mainScreenDetails.length > 0 &&
-                                  manageDetails.mainScreenDetails.map(
-                                    (info, index) => {
-                                      if (info.drop) {
-                                        return (
-                                          <React.Fragment key={index}>
-                                            <Moveable
-                                              ref={moveableRef}
-                                              target={`.target-${index}`}
-                                              draggable={true}
-                                              throttleDrag={1}
-                                              edgeDraggable={false}
-                                              startDragRotate={0}
-                                              throttleDragRotate={0}
-                                              resizable={true}
-                                              keepRatio={false}
-                                              snappable={true}
-                                              bounds={{
-                                                left: 0,
-                                                top: 0,
-                                                right: 0,
-                                                bottom: 0,
-                                                position: "css",
-                                              }}
-                                              edge={[]}
-                                              onDrag={(e) => {
-                                                e.target.style.transform =
-                                                  e.transform;
-                                                handleSaveXAndYAxis(index, {
-                                                  distance: [
-                                                    e.translate[0],
-                                                    e.translate[1],
-                                                  ],
-                                                });
-                                              }}
-                                              onResize={(e) => {
-                                                e.target.style.width = `${e.width}px`;
-                                                e.target.style.height = `${e.height}px`;
-                                                e.target.style.transform =
-                                                  e.drag.transform;
-                                                handleSaveXAndYAxis(index, {
-                                                  height: e.height,
-                                                  width: e.width,
-                                                });
-                                              }}
-                                            />
-                                            <div
-                                              className={`file-uploaded-grid target-${index}`}
-                                              style={{ position: "absolute" }}
-                                            >
-                                              {info?.fileObj ? (
-                                                <div
-                                                  className={`file-uploaded`}
-                                                  style={{
-                                                    textAlign:
-                                                      index % 2 == 0
-                                                        ? "end"
-                                                        : "start",
-                                                  }}
-                                                >
-                                                  <img
-                                                    src={info?.fileObj}
-                                                    className="img-view"
-                                                  />
-                                                  <HighlightOffIcon
-                                                    className={`iconInfo right-align`}
-                                                    onClick={() =>
-                                                      handleOnChangeFile(
-                                                        "",
-                                                        index,
-                                                        "clear"
-                                                      )
-                                                    }
-                                                  />
-                                                </div>
-                                              ) : (
-                                                <div className="file-info">
-                                                  <FileUploader
-                                                    multiple={true}
-                                                    handleChange={(e) =>
-                                                      handleOnChangeFile(
-                                                        e,
-                                                        index,
-                                                        "upload"
-                                                      )
-                                                    }
-                                                    name="file"
-                                                    classes="fileUp"
-                                                    types={fileTypes}
+                                <ZoomPan>
+                                  <div x={0} y={0} h={0}></div>
+                                  <div x={0} y={0} h={1080} w={1920}>
+                                    {manageDetails.mainScreenDetails.length >
+                                      0 &&
+                                      manageDetails.mainScreenDetails.map(
+                                        (info, index) => {
+                                          if (info.drop) {
+                                            return (
+                                              <Grid
+                                                key={index}
+                                                xs={6}
+                                                className={`file-uploaded-grid`}
+                                              >
+                                                {info?.fileObj ? (
+                                                  <Box
+                                                    className={`file-uploaded`}
                                                     style={{
-                                                      padding: "0px",
-                                                      margin: "0px",
-                                                      border: "1px solid #000",
-                                                      width: "100%",
+                                                      textAlign:
+                                                        index % 2 == 0
+                                                          ? "end"
+                                                          : "start",
                                                     }}
-                                                  />
-                                                </div>
-                                              )}
-                                            </div>
-                                          </React.Fragment>
-                                        );
-                                      }
-                                    }
-                                  )}
+                                                  >
+                                                    <img
+                                                      src={info?.fileObj}
+                                                      className="img-view"
+                                                    />
+                                                    <HighlightOffIcon
+                                                      className={`iconInfo right-align`}
+                                                      onClick={() =>
+                                                        handleOnChangeFile(
+                                                          "",
+                                                          index,
+                                                          "clear"
+                                                        )
+                                                      }
+                                                    />
+                                                  </Box>
+                                                ) : (
+                                                  <Box className="file-info">
+                                                    <FileUploader
+                                                      multiple={true}
+                                                      handleChange={(e) =>
+                                                        handleOnChangeFile(
+                                                          e,
+                                                          index,
+                                                          "upload"
+                                                        )
+                                                      }
+                                                      name="file"
+                                                      classes="fileUp"
+                                                      types={fileTypes}
+                                                      style={{
+                                                        padding: "0px",
+                                                        margin: "0px",
+                                                        border:
+                                                          "1px solid #000",
+                                                        width: "100%",
+                                                      }}
+                                                    />
+                                                  </Box>
+                                                )}
+                                              </Grid>
+                                            );
+                                          }
+                                        }
+                                      )}
+                                  </div>
+                                </ZoomPan>
                                 {provided.placeholder}
-                                {/************************************************ TO HERE *********************************/}
-
-                                {/* Red horizontal and vertical line start */}
-                                <>
-                                  {manageDetails.monitorType.filter}
-                                  {manageDetails.monitor?.totalScreen === 4 && (
-                                    <div
-                                      style={{
-                                        height: "1px",
-                                        width: "100%",
-                                        backgroundColor: "red",
-                                        top: "50%",
-                                        left: 0,
-                                        position: "absolute",
-                                      }}
-                                    ></div>
-                                  )}
-                                  {[2, 4].includes(
-                                    manageDetails.monitor?.totalScreen
-                                  ) && (
-                                    <div
-                                      style={{
-                                        height: "100%",
-                                        width: "1px",
-                                        backgroundColor: "red",
-                                        left: "50%",
-                                        top: 0,
-                                        position: "absolute",
-                                      }}
-                                    ></div>
-                                  )}
-                                </>
-                                {/* Red horizontal and vertical line end */}
-                              </div>
+                              </Box>
                             );
                           }}
                         </Droppable>
-                      </div>
-                    </ZoomPan>
-                  </div>
+                        <>
+                          {manageDetails.monitorType.filter}
+                          {manageDetails.monitor?.totalScreen === 4 && (
+                            <div
+                              style={{
+                                height: "1px",
+                                width: "100%",
+                                backgroundColor: "red",
+                                top: "50%",
+                                left: 0,
+                                position: "absolute",
+                              }}
+                            ></div>
+                          )}
+                          {[2, 4].includes(
+                            manageDetails.monitor?.totalScreen
+                          ) && (
+                            <div
+                              style={{
+                                height: "100%",
+                                width: "1px",
+                                backgroundColor: "red",
+                                left: "50%",
+                                top: 0,
+                                position: "absolute",
+                              }}
+                            ></div>
+                          )}
+                        </>
+                      </Grid>
+                    </Box>
+                  </ZoomPan>
                 )}
               </Box>
             </Grid>
@@ -672,10 +698,153 @@ const Main = ({
                 boxShadow: "inset 0px 0px 4px 0px #888888",
               }}
             >
+              {/* <Box key={"topPanel"} style={{ border: "1px solid #000" }}>
+                Top Section
+                <Box style={{ margin: 2 }}>
+                  <Droppable droppableId={"topPanel"} key={"topPanel"}>
+                    {(provided, snapshot) => {
+                      return (
+                        <Box
+                          {...provided.droppableProps}
+                          ref={provided.innerRef}
+                          style={{
+                            padding: 0,
+                            minHeight: "100px",
+                          }}
+                        >
+                          <Box>
+                            <Draggable key={"1"} draggableId={"1"}>
+                              {(provided, snapshot) => {
+                                return (
+                                  <Box
+                                    ref={provided.innerRef}
+                                    {...provided.draggableProps}
+                                    {...provided.dragHandleProps}
+                                    style={{
+                                      userSelect: "none",
+                                      padding: 4,
+                                      margin: "0 0 8px 0",
+                                      minHeight: "50px",
+                                      ...provided.draggableProps.style,
+                                    }}
+                                  >
+                                    <Box
+                                      dragging={snapshot.isDragging}
+                                      className="file-info"
+                                    >
+                                      Image
+                                      <FileUploader
+                                        multiple={true}
+                                        handleChange={(e) =>
+                                          handleOnChangeFile(e, index, "upload")
+                                        }
+                                        name="file"
+                                        classes="fileUp"
+                                        types={fileTypes}
+                                        style={{
+                                          padding: "0px",
+                                          margin: "0px",
+                                          border: "1px solid #000",
+                                          width: "100%",
+                                        }}
+                                      />
+                                    </Box>
+                                  </Box>
+                                );
+                              }}
+                            </Draggable>
+                            <Draggable key={"2"} draggableId={"2"}>
+                              {(provided, snapshot) => {
+                                return (
+                                  <Box
+                                    ref={provided.innerRef}
+                                    {...provided.draggableProps}
+                                    {...provided.dragHandleProps}
+                                    style={{
+                                      userSelect: "none",
+                                      padding: 4,
+                                      margin: "0 0 8px 0",
+                                      minHeight: "50px",
+                                      ...provided.draggableProps.style,
+                                    }}
+                                  >
+                                    <Box
+                                      dragging={snapshot.isDragging}
+                                      className="file-info"
+                                    >
+                                      Video
+                                      <FileUploader
+                                        multiple={true}
+                                        handleChange={(e) =>
+                                          handleOnChangeFile(e, index, "upload")
+                                        }
+                                        name="file"
+                                        classes="fileUp"
+                                        types={["mp4"]}
+                                        style={{
+                                          padding: "0px",
+                                          margin: "0px",
+                                          border: "1px solid #000",
+                                          width: "100%",
+                                        }}
+                                      />
+                                    </Box>
+                                  </Box>
+                                );
+                              }}
+                            </Draggable>
+                            <Draggable key={"3"} draggableId={"3"}>
+                              {(provided, snapshot) => {
+                                return (
+                                  <Box
+                                    ref={provided.innerRef}
+                                    {...provided.draggableProps}
+                                    {...provided.dragHandleProps}
+                                    style={{
+                                      userSelect: "none",
+                                      padding: 4,
+                                      margin: "0 0 8px 0",
+                                      minHeight: "50px",
+                                      ...provided.draggableProps.style,
+                                    }}
+                                  >
+                                    <Box
+                                      dragging={snapshot.isDragging}
+                                      className="file-info"
+                                    >
+                                      PDF
+                                      <FileUploader
+                                        multiple={true}
+                                        handleChange={(e) =>
+                                          handleOnChangeFile(e, index, "upload")
+                                        }
+                                        name="file"
+                                        classes="fileUp"
+                                        types={["PDF"]}
+                                        style={{
+                                          padding: "0px",
+                                          margin: "0px",
+                                          border: "1px solid #000",
+                                          width: "100%",
+                                        }}
+                                      />
+                                    </Box>
+                                  </Box>
+                                );
+                              }}
+                            </Draggable>
+                          </Box>
+                          {provided.placeholder}
+                        </Box>
+                      );
+                    }}
+                  </Droppable>
+                </Box>
+              </Box> */}
               <Table>
                 <TableHead>
                   <TableRow>
-                    <TableCell component="th" scope="row" colSpan={4}>
+                    <TableCell component="th" scope="row" colSpan={3}>
                       <h3>Basic Information</h3>
                     </TableCell>
                   </TableRow>
@@ -683,55 +852,44 @@ const Main = ({
                 <TableBody>
                   <TableRow>
                     <TableCell>Resolution</TableCell>
-                    <TableCell colSpan={3}>
-                      {manageDetails.resolution.value}
+                    <TableCell colSpan={2}>
+                      {manageDetails.resolutionType[manageDetails.resolution]}
                     </TableCell>
                   </TableRow>
                   <TableRow>
                     <TableCell>Monitor</TableCell>
-                    <TableCell colSpan={3}>
+                    <TableCell colSpan={2}>
                       {manageDetails.monitor?.title}
                     </TableCell>
                   </TableRow>
                   <TableRow>
                     <TableCell>Angle</TableCell>
-                    <TableCell colSpan={3}>{manageDetails.angle}</TableCell>
+                    <TableCell colSpan={2}>{manageDetails.angle}</TableCell>
                   </TableRow>
                   <TableRow>
-                    <TableCell>View</TableCell>
-                    <TableCell>[X,Y] </TableCell>
-                    <TableCell>Width</TableCell>
-                    <TableCell>Height</TableCell>
+                    <TableCell>Day </TableCell>
+                    <TableCell>Time(HH:MM:SS)</TableCell>
+                    <TableCell>File</TableCell>
                   </TableRow>
-                  {manageDetails.mainScreenDetails.length === 0 && (
-                    <TableRow>
-                      <TableCell colSpan={4} align="center">
-                        Components not available...{" "}
-                      </TableCell>
-                    </TableRow>
-                  )}
-                  {manageDetails.mainScreenDetails.length > 0 &&
+                  {/* {manageDetails.mainScreenDetails.length > 0 &&
                     manageDetails.mainScreenDetails.map((info, index) => {
                       return (
                         <TableRow key={index}>
+                          <TableCell>{info.totalDay}</TableCell>
                           <TableCell>
-                            {info.fileObj ? (
+                            {`${info.hours}:${info.minutes}:${info.second}`}
+                          </TableCell>
+                          <TableCell>
+                            {info.fileObj && (
                               <img
                                 src={info.fileObj}
                                 style={{ width: "15px", height: "15px" }}
                               />
-                            ) : (
-                              "Component"
                             )}
                           </TableCell>
-                          <TableCell>
-                            {info.distance?.[0]}, {info.distance?.[1]}
-                          </TableCell>
-                          <TableCell>{info.width}</TableCell>
-                          <TableCell>{info.height}</TableCell>
                         </TableRow>
                       );
-                    })}
+                    })} */}
                 </TableBody>
               </Table>
             </Grid>
