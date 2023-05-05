@@ -3,7 +3,6 @@ import Main from "./Main";
 import {
   angleType,
   monitorType,
-  resolutionType,
   resolutionTypeNew,
 } from "@/Assets/comman/common";
 import { v4 as uuidv4 } from "uuid";
@@ -24,8 +23,6 @@ const MainContainer = () => {
     },
     monitorType: [],
     monitorTypePopup: false,
-    monitorSize1: 0,
-    monitorSize2: 0,
     screenMonitor1: 0,
     screenMonitor2: 0,
     angle: "",
@@ -45,6 +42,7 @@ const MainContainer = () => {
       items: [],
     },
   });
+
   const defaultHeight = 350;
   const defaultWidth = 350;
 
@@ -363,6 +361,7 @@ const MainContainer = () => {
       });
     }
   };
+
   const handleSaveXAndYAxis = (
     index,
     data = { distance: [], width: 0, height: 0 }
