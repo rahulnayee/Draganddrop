@@ -1,11 +1,6 @@
 import {
   Box,
   Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
   FormControl,
   Grid,
   InputLabel,
@@ -109,43 +104,6 @@ const Main = ({
           />
         </FormControl>
       </>
-    );
-  };
-  const handleImageComponents = (type, provided, snapshot) => {
-    return (
-      <Box
-        ref={provided.innerRef}
-        {...provided.draggableProps}
-        {...provided.dragHandleProps}
-        style={{
-          userSelect: "none",
-          padding: 4,
-          margin: "0 0 8px 0",
-          minHeight: "50px",
-          ...provided.draggableProps.style,
-        }}
-        key={type.id}
-      >
-        <Box className="file-info" dragging={snapshot.isDragging}>
-          <p>
-            {type.id}
-            {type.content}
-          </p>
-          <FileUploader
-            multiple={true}
-            handleChange={(e) => handleOnChangeFile(e, index, "upload")}
-            name="file"
-            classes="fileUp"
-            types={fileTypes}
-            style={{
-              padding: "0px",
-              margin: "0px",
-              border: "1px solid #000",
-              width: "100%",
-            }}
-          />
-        </Box>
-      </Box>
     );
   };
 
