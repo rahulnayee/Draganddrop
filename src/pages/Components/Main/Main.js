@@ -28,6 +28,8 @@ import HighlightOffIcon from "@mui/icons-material/HighlightOff";
 import { ZoomPan } from "react-zoom-pan/lib.cjs";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import Moveable from "react-moveable-fork";
+import { Player } from "video-react";
+import ControllerContainer from "../Controller/ControllerContainer";
 
 const Main = ({
   manageDetails,
@@ -40,6 +42,7 @@ const Main = ({
   handleManagePopup,
   onDragEnd,
   handleSaveXAndYAxis,
+  handleVideoChange,
 }) => {
   const fileTypes = ["JPEG", "PNG", "GIF", "JPG"];
   const zoomingContent = useRef();
@@ -435,6 +438,14 @@ const Main = ({
               </Grid>
 
               <Box className="zooming-content">
+                <ControllerContainer
+                  controllerType={"video"}
+                  fileType="file"
+                  acceptFiles=".mov,.mp4"
+                  fileClass=""
+                  buttonLabel="Upload..."
+                />
+
                 {/* *******************************  EDITOR SECTION START HERE  ********************************* */}
                 {manageDetails.createRegions && (
                   <div
@@ -519,6 +530,7 @@ const Main = ({
                                                 });
                                               }}
                                             />
+
                                             <div
                                               className={`file-uploaded-grid target-${index}`}
                                               style={{ position: "absolute" }}
@@ -526,12 +538,6 @@ const Main = ({
                                               {info?.fileObj ? (
                                                 <div
                                                   className={`file-uploaded`}
-                                                  style={{
-                                                    textAlign:
-                                                      index % 2 == 0
-                                                        ? "end"
-                                                        : "start",
-                                                  }}
                                                 >
                                                   <img
                                                     src={info?.fileObj}

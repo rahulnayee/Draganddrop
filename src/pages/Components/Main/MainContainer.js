@@ -374,6 +374,12 @@ const MainContainer = () => {
     });
   };
 
+  const handleVideoChange = ({ file }) => {
+    var reader = new FileReader();
+    var url = URL.createObjectURL(file.originFileObj);
+    seVideoSrc(url);
+  };
+
   useEffect(() => {
     setManageDetails({
       ...manageDetails,
@@ -395,6 +401,7 @@ const MainContainer = () => {
       handleManagePopup={handleManagePopup}
       onDragEnd={onDragEnd}
       handleSaveXAndYAxis={handleSaveXAndYAxis}
+      handleVideoChange={handleVideoChange}
     />
   );
 };
