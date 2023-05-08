@@ -1,8 +1,7 @@
 import React, { useRef, useState } from "react";
 import Controller from "./Controller";
 
-const ControllerContainer = ({ props }) => {
-    
+const ControllerContainer = (props) => {
   const [manageFiles, setManageFiles] = useState({
     image: null,
     video: null,
@@ -21,10 +20,10 @@ const ControllerContainer = ({ props }) => {
 
   return (
     <Controller
-      {...props}
       fileRef={videoRef}
       manageFiles={manageFiles}
       handleControllerChange={handleFileChange}
+      {...props}
     />
   );
 };

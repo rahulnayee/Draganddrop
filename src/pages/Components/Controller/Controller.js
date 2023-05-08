@@ -9,22 +9,29 @@ const Controller = (props) => {
     controllerType = "video",
     acceptFiles = ".mov,.mp4",
     fileClass = "VideoInput_input",
-    buttonLabel = "Upload...",
+    buttonLabel,
     handleControllerChange,
   } = props;
   return (
-    <div>
+    <div style={{ width: "100%", height: "100%" }}>
       {controllerType === "video" && (
         <div className="video-container">
           {manageFiles.video === null && (
-            <Button
-              variant="contained"
-              component="label"
-              onClick={() => {
-                fileRef.current.click();
-              }}
-            >
-              {buttonLabel}
+            <div style={{ width: "100%", height: "100%" }}>
+              <Button
+                variant="contained"
+                onClick={() => {
+                  fileRef.current.click();
+                }}
+                style={{
+                  maxHeight: "100%",
+                  maxWidth: "100%",
+                  width: "100%",
+                  height: "100%",
+                }}
+              >
+                {buttonLabel}
+              </Button>
               <input
                 ref={fileRef}
                 type={fileType}
@@ -33,15 +40,16 @@ const Controller = (props) => {
                 onChange={(event) => handleControllerChange(event, "video")}
                 hidden
               />
-            </Button>
+            </div>
           )}
           {manageFiles.video !== null && (
             <video
-              className="VideoInput_video"
-              width="100%"
-              height="50%"
+              className="video-content"
+              width="auto"
+              height="auto"
               controls
               src={manageFiles.video}
+
             />
           )}
         </div>

@@ -438,14 +438,6 @@ const Main = ({
               </Grid>
 
               <Box className="zooming-content">
-                <ControllerContainer
-                  controllerType={"video"}
-                  fileType="file"
-                  acceptFiles=".mov,.mp4"
-                  fileClass=""
-                  buttonLabel="Upload..."
-                />
-
                 {/* *******************************  EDITOR SECTION START HERE  ********************************* */}
                 {manageDetails.createRegions && (
                   <div
@@ -535,47 +527,61 @@ const Main = ({
                                               className={`file-uploaded-grid target-${index}`}
                                               style={{ position: "absolute" }}
                                             >
-                                              {info?.fileObj ? (
-                                                <div
-                                                  className={`file-uploaded`}
-                                                >
-                                                  <img
-                                                    src={info?.fileObj}
-                                                    className="img-view"
-                                                  />
-                                                  <HighlightOffIcon
-                                                    className={`iconInfo right-align`}
-                                                    onClick={() =>
-                                                      handleOnChangeFile(
-                                                        "",
-                                                        index,
-                                                        "clear"
-                                                      )
-                                                    }
-                                                  />
+                                              {info.content === "Image" && (
+                                                <div className="file-image">
+                                                  {info?.fileObj ? (
+                                                    <div
+                                                      className={`file-uploaded`}
+                                                    >
+                                                      <img
+                                                        src={info?.fileObj}
+                                                        className="img-view"
+                                                      />
+                                                      <HighlightOffIcon
+                                                        className={`iconInfo right-align`}
+                                                        onClick={() =>
+                                                          handleOnChangeFile(
+                                                            "",
+                                                            index,
+                                                            "clear"
+                                                          )
+                                                        }
+                                                      />
+                                                    </div>
+                                                  ) : (
+                                                    <div className="file-info">
+                                                      <FileUploader
+                                                        multiple={true}
+                                                        handleChange={(e) =>
+                                                          handleOnChangeFile(
+                                                            e,
+                                                            index,
+                                                            "upload"
+                                                          )
+                                                        }
+                                                        name="file"
+                                                        classes="fileUp"
+                                                        types={fileTypes}
+                                                        style={{
+                                                          padding: "0px",
+                                                          margin: "0px",
+                                                          border:
+                                                            "1px solid #000",
+                                                          width: "100%",
+                                                        }}
+                                                      />
+                                                    </div>
+                                                  )}
                                                 </div>
-                                              ) : (
-                                                <div className="file-info">
-                                                  <FileUploader
-                                                    multiple={true}
-                                                    handleChange={(e) =>
-                                                      handleOnChangeFile(
-                                                        e,
-                                                        index,
-                                                        "upload"
-                                                      )
-                                                    }
-                                                    name="file"
-                                                    classes="fileUp"
-                                                    types={fileTypes}
-                                                    style={{
-                                                      padding: "0px",
-                                                      margin: "0px",
-                                                      border: "1px solid #000",
-                                                      width: "100%",
-                                                    }}
-                                                  />
-                                                </div>
+                                              )}
+                                              {info.content === "Video" && (
+                                                <ControllerContainer
+                                                  controllerType={"video"}
+                                                  fileType="file"
+                                                  acceptFiles=".mov,.mp4"
+                                                  fileClass="video-upload"
+                                                  buttonLabel="Video Upload..."
+                                                />
                                               )}
                                             </div>
                                           </React.Fragment>
