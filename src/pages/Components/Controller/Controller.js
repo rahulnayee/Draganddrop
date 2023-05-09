@@ -1,62 +1,99 @@
 import { Button } from "@mui/material";
 import React from "react";
+import HighlightOffIcon from "@mui/icons-material/HighlightOff";
+import { FileUploader } from "react-drag-drop-files";
 
 const Controller = (props) => {
   const {
-    fileRef,
-    manageFiles,
-    fileType = "file",
-    controllerType = "video",
-    acceptFiles = ".mov,.mp4",
-    fileClass = "VideoInput_input",
-    buttonLabel,
+    index,
+    fileData,
+    controllerType,
+    acceptFiles,
+    fileClass,
     handleControllerChange,
+    handleControllerClear,
   } = props;
-  return (
-    <div style={{ width: "100%", height: "100%" }}>
-      {controllerType === "video" && (
-        <div className="video-container">
-          {manageFiles.video === null && (
-            <div style={{ width: "100%", height: "100%" }}>
-              <Button
-                variant="contained"
-                onClick={() => {
-                  fileRef.current.click();
-                }}
-                style={{
-                  maxHeight: "100%",
-                  maxWidth: "100%",
-                  width: "100%",
-                  height: "100%",
-                }}
-              >
-                {buttonLabel}
-              </Button>
-              <input
-                ref={fileRef}
-                type={fileType}
-                accept={acceptFiles}
-                className={fileClass}
-                onChange={(event) => handleControllerChange(event, "video")}
-                hidden
-              />
-            </div>
-          )}
-          {manageFiles.video !== null && (
-            <video
-              className="video-content"
-              width="auto"
-              height="auto"
-              controls
-              src={manageFiles.video}
 
-            />
-          )}
+  const handleUploadedContent = (TypesOfContent, handleClear) => {
+    return (
+      <div
+        className={`file-uploaded ${TypesOfContent === "PDF" && "file-pdf"}`}
+      >
+        {TypesOfContent}
+        <HighlightOffIcon
+          className={`iconInfo right-align`}
+          onClick={handleClear}
+        />
+      </div>
+    );
+  };
+  const handleFileUploadContent = (type, onChange, classDetails) => {
+    return (
+      <div className="file-info">
+        <FileUploader
+          handleChange={onChange}
+          classes={classDetails}
+          types={type}
+          name="file"
+          style={{
+            padding: "0px",
+            margin: "0px",
+            border: "1px solid #000",
+            width: "100%",
+          }}
+        />
+      </div>
+    );
+  };
+
+  return (
+    <div style={{ width: "100%", height: "100%" }} key={index}>
+      {controllerType.toLowerCase() === "image" && (
+        <div className="file-image">
+          {fileData
+            ? handleUploadedContent(
+                <img src={fileData} className="img-view" />,
+                handleControllerClear
+              )
+            : handleFileUploadContent(
+                acceptFiles,
+                handleControllerChange,
+                fileClass
+              )}
         </div>
       )}
-      {controllerType === "pdf" && (
-        <div className="pdf-container">pdf contain</div>
+      {controllerType.toLowerCase() === "video" && (
+        <div className="file-image">
+          {fileData
+            ? handleUploadedContent(
+                <video
+                  src={fileData}
+                  className="video-content"
+                  width="auto"
+                  height="auto"
+                  controls
+                />,
+                handleControllerClear
+              )
+            : handleFileUploadContent(
+                acceptFiles,
+                handleControllerChange,
+                fileClass
+              )}
+        </div>
       )}
+      {controllerType.toLowerCase() === "pdf" && (
+        <div className="file-image">
+          {fileData
+            ? handleUploadedContent("PDF", handleControllerClear)
+            : handleFileUploadContent(
+                acceptFiles,
+                handleControllerChange,
+                fileClass
+              )}
+        </div>
+      )}
+      
     </div>
   );
 };

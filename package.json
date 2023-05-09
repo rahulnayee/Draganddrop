@@ -13,6 +13,7 @@
     "@emotion/styled": "^11.10.6",
     "@mui/icons-material": "^5.11.16",
     "@mui/material": "^5.12.1",
+    "@react-pdf-viewer/core": "^3.12.0",
     "@scena/react-ruler": "^0.17.1",
     "@scena/ruler": "^0.18.3",
     "@zeit/next-sass": "^0.0.6",
@@ -28,8 +29,7 @@
     "react-quick-pinch-zoom": "^4.6.0",
     "react-zoom-pan": "^0.1.48",
     "ruler-guides": "^2.1.1",
-    "uuid": "^9.0.0",
-    "video-react": "^0.16.0"
+    "uuid": "^9.0.0"
   },
   "devDependencies": {
     "sass": "^1.62.1"
