@@ -28,8 +28,8 @@ import HighlightOffIcon from "@mui/icons-material/HighlightOff";
 import { ZoomPan } from "react-zoom-pan/lib.cjs";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import Moveable from "react-moveable-fork";
-import { Player } from "video-react";
 import ControllerContainer from "../Controller/ControllerContainer";
+import TickerContainer from "../Ticker/TickerContainer";
 
 const Main = ({
   manageDetails,
@@ -42,10 +42,13 @@ const Main = ({
   handleManagePopup,
   onDragEnd,
   handleSaveXAndYAxis,
-  handleVideoChange,
 }) => {
-  const fileTypes = ["JPEG", "PNG", "GIF", "JPG"];
+  const imageTypes = ["JPEG", "PNG", "GIF", "JPG"];
+  const videoTypes = ["MP4", "MOV", "MKV"];
+  const pdfTypes = ["PDF"];
   const zoomingContent = useRef();
+  const moveableRef = useRef();
+  const videoRef = useRef(null);
 
   const handleResolutionPopupContent = () => {
     return (
@@ -83,6 +86,7 @@ const Main = ({
       </>
     );
   };
+
   const handleMonitorPopupContent = () => {
     return (
       <>
@@ -109,8 +113,6 @@ const Main = ({
       </>
     );
   };
-
-  const moveableRef = useRef();
 
   useEffect(() => {
     const div = document.getElementById("band");
@@ -436,7 +438,6 @@ const Main = ({
                   }}
                 </Droppable>
               </Grid>
-
               <Box className="zooming-content">
                 {/* *******************************  EDITOR SECTION START HERE  ********************************* */}
                 {manageDetails.createRegions && (
@@ -462,7 +463,7 @@ const Main = ({
                         }}
                       >
                         <Droppable droppableId={"centareScreen"}>
-                          {(provided, snapshot) => {
+                          {(provided) => {
                             return (
                               <div
                                 {...provided.droppableProps}
@@ -475,7 +476,6 @@ const Main = ({
                                 }}
                               >
                                 {/**************************** ACTUAL DROP CONTENT WILL BE GOES HERE ***********************************/}
-
                                 {manageDetails.mainScreenDetails.length > 0 &&
                                   manageDetails.mainScreenDetails.map(
                                     (info, index) => {
@@ -517,70 +517,136 @@ const Main = ({
                                                 e.target.style.transform =
                                                   e.drag.transform;
                                                 handleSaveXAndYAxis(index, {
+                                                  distance: [
+                                                    e.drag.translate[0],
+                                                    e.drag.translate[1],
+                                                  ],
                                                   height: e.height,
                                                   width: e.width,
                                                 });
                                               }}
                                             />
-
                                             <div
                                               className={`file-uploaded-grid target-${index}`}
                                               style={{ position: "absolute" }}
                                             >
-                                              {info.content === "Image" && (
-                                                <div className="file-image">
-                                                  {info?.fileObj ? (
-                                                    <div
-                                                      className={`file-uploaded`}
-                                                    >
-                                                      <img
-                                                        src={info?.fileObj}
-                                                        className="img-view"
-                                                      />
-                                                      <HighlightOffIcon
-                                                        className={`iconInfo right-align`}
-                                                        onClick={() =>
-                                                          handleOnChangeFile(
-                                                            "",
-                                                            index,
-                                                            "clear"
-                                                          )
-                                                        }
-                                                      />
-                                                    </div>
-                                                  ) : (
-                                                    <div className="file-info">
-                                                      <FileUploader
-                                                        multiple={true}
-                                                        handleChange={(e) =>
-                                                          handleOnChangeFile(
-                                                            e,
-                                                            index,
-                                                            "upload"
-                                                          )
-                                                        }
-                                                        name="file"
-                                                        classes="fileUp"
-                                                        types={fileTypes}
-                                                        style={{
-                                                          padding: "0px",
-                                                          margin: "0px",
-                                                          border:
-                                                            "1px solid #000",
-                                                          width: "100%",
-                                                        }}
-                                                      />
-                                                    </div>
-                                                  )}
-                                                </div>
-                                              )}
-                                              {info.content === "Video" && (
+                                              {info.content.toLowerCase() ===
+                                                "image" && (
                                                 <ControllerContainer
+                                                  index={index}
+                                                  fileData={
+                                                    manageDetails
+                                                      .mainScreenDetails[index]
+                                                      ?.fileObj
+                                                  }
+                                                  controllerType={"image"}
+                                                  acceptFiles={imageTypes}
+                                                  fileClass={
+                                                    "fileUp image-upload" +
+                                                    index
+                                                  }
+                                                  label="Image Upload"
+                                                  handleControllerChange={(e) =>
+                                                    handleOnChangeFile(
+                                                      e,
+                                                      index,
+                                                      "upload",
+                                                      "Image"
+                                                    )
+                                                  }
+                                                  handleControllerClear={() =>
+                                                    handleOnChangeFile(
+                                                      "",
+                                                      index,
+                                                      "clear",
+                                                      "Image"
+                                                    )
+                                                  }
+                                                />
+                                              )}
+                                              {info.content.toLowerCase() ===
+                                                "video" && (
+                                                <ControllerContainer
+                                                  index={index}
+                                                  fileData={
+                                                    manageDetails
+                                                      .mainScreenDetails[index]
+                                                      ?.fileObj
+                                                  }
                                                   controllerType={"video"}
-                                                  fileType="file"
-                                                  acceptFiles=".mov,.mp4"
-                                                  fileClass="video-upload"
-                                                  buttonLabel="Video Upload..."
+                                                  acceptFiles={videoTypes}
+                                                  fileClass={
+                                                    "fileUp video-upload" +
+                                                    index
+                                                  }
+                                                  label="Video Upload"
+                                                  handleControllerChange={(e) =>
+                                                    handleOnChangeFile(
+                                                      e,
+                                                      index,
+                                                      "upload",
+                                                      "Video"
+                                                    )
+                                                  }
+                                                  handleControllerClear={() =>
+                                                    handleOnChangeFile(
+                                                      "",
+                                                      index,
+                                                      "clear",
+                                                      "Video"
+                                                    )
+                                                  }
+                                                />
+                                              )}
+                                              {info.content.toLowerCase() ===
+                                                "pdf" && (
+                                                <ControllerContainer
+                                                  index={index}
+                                                  fileData={
+                                                    manageDetails
+                                                      .mainScreenDetails[index]
+                                                      ?.fileObj
+                                                  }
+                                                  controllerType={"pdf"}
+                                                  acceptFiles={pdfTypes}
+                                                  fileClass={
+                                                    "fileUp pdf-upload" + index
+                                                  }
+                                                  label="PDF Upload"
+                                                  handleControllerChange={(e) =>
+                                                    handleOnChangeFile(
+                                                      e,
+                                                      index,
+                                                      "upload",
+                                                      "PDF"
+                                                    )
+                                                  }
+                                                  handleControllerClear={() =>
+                                                    handleOnChangeFile(
+                                                      "",
+                                                      index,
+                                                      "clear",
+                                                      "PDF"
+                                                    )
+                                                  }
+                                                />
+                                              )}
+                                              {info.content.toLowerCase() ===
+                                                "ticker" && (
+                                                <TickerContainer
+                                                  mainContain={"Change Text"}
+                                                  width={width}
+                                                  height={height}
+                                                  direction={direction}
+                                                  behavior={behavior}
+                                                  scrollDelay={scrollDelay}
+                                                  scrollAmount={scrollAmount}
+                                                  loop={loop}
+                                                  backgroundColor={
+                                                    backgroundColor
+                                                  }
+                                                  hspace={hspace}
+                                                  vspace={vspace}
                                                 />
                                               )}
                                             </div>

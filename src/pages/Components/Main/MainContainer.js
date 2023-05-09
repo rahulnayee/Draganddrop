@@ -41,6 +41,19 @@ const MainContainer = () => {
       name: "centareScreen",
       items: [],
     },
+    ticker: {
+      mainContain: "",
+      width: "",
+      height: "",
+      direction: "",
+      behavior: "",
+      scrollDelay: "",
+      scrollAmount: "",
+      loop: "",
+      backgroundColor: "",
+      hspace: "",
+      vspace: "",
+    },
   });
 
   const defaultHeight = 350;
@@ -109,14 +122,16 @@ const MainContainer = () => {
     });
   };
 
-  const handleOnChangeFile = (fileObj, index, action) => {
+  const handleOnChangeFile = (fileObj, index, action, uploadType) => {
     let mainScreenDetails = [...manageDetails.mainScreenDetails];
     if (action === "upload") {
-      mainScreenDetails[index].fileObj = URL.createObjectURL(fileObj[0]);
-      mainScreenDetails[index].fileDetails = fileObj[0];
+      mainScreenDetails[index].fileObj = URL.createObjectURL(fileObj);
+      mainScreenDetails[index].fileDetails = fileObj; //[0];
+      mainScreenDetails[index].content = uploadType;
     } else {
       mainScreenDetails[index].fileObj = null;
       mainScreenDetails[index].fileDetails = null;
+      mainScreenDetails[index].content = uploadType;
     }
     setManageDetails({
       ...manageDetails,
@@ -374,12 +389,6 @@ const MainContainer = () => {
     });
   };
 
-  const handleVideoChange = ({ file }) => {
-    var reader = new FileReader();
-    var url = URL.createObjectURL(file.originFileObj);
-    seVideoSrc(url);
-  };
-
   useEffect(() => {
     setManageDetails({
       ...manageDetails,
@@ -401,7 +410,6 @@ const MainContainer = () => {
       handleManagePopup={handleManagePopup}
       onDragEnd={onDragEnd}
       handleSaveXAndYAxis={handleSaveXAndYAxis}
-      handleVideoChange={handleVideoChange}
     />
   );
 };
