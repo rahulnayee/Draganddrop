@@ -53,7 +53,11 @@ const MainContainer = () => {
       backgroundColor: "",
       hspace: "",
       vspace: "",
+      fontSize: "",
+      id: "",
     },
+    tickerPropertiesPopup: false,
+    tickerPopupId: null,
   });
 
   const defaultHeight = 350;
@@ -65,7 +69,15 @@ const MainContainer = () => {
       [key]: value,
     });
   };
-
+  const handleTickerOnChange = (key, value) => {
+    setManageDetails({
+      ...manageDetails,
+      ticker: {
+        ...manageDetails.ticker,
+        [key]: value,
+      },
+    });
+  };
   const handleManagePopup = (popupKey, popupValue) => {
     if (popupKey === "resolutionTypePopup") {
       setManageDetails({
@@ -84,7 +96,6 @@ const MainContainer = () => {
       });
     }
   };
-
   const handleCreateResolution = () => {
     let resolutionInfo = [...manageDetails.resolutionType];
 
@@ -104,7 +115,6 @@ const MainContainer = () => {
       heightResolution: "",
     });
   };
-
   const handleCreateMonitor = () => {
     let monitorInfo = [...manageDetails.monitorType];
     monitorInfo.push({
@@ -121,7 +131,6 @@ const MainContainer = () => {
       screenMonitor2: "",
     });
   };
-
   const handleOnChangeFile = (fileObj, index, action, uploadType) => {
     let mainScreenDetails = [...manageDetails.mainScreenDetails];
     if (action === "upload") {
@@ -139,7 +148,6 @@ const MainContainer = () => {
       mainScreenDetails: mainScreenDetails,
     });
   };
-
   const handleCreateRegions = () => {
     if (
       manageDetails.monitor.title &&
@@ -175,7 +183,6 @@ const MainContainer = () => {
       alert("please select Region info....");
     }
   };
-
   const handleCreateXML = () => {
     let projectId = uuidv4();
     let resolutionId = uuidv4();
@@ -328,7 +335,6 @@ const MainContainer = () => {
     //download XML file
     handleFileDownloader(XMLFile, "application/xml", "output.xml");
   };
-
   const handleFileDownloader = (data, type, name) => {
     let blob = new Blob([data], { type });
     let url = window.URL.createObjectURL(blob);
@@ -338,7 +344,6 @@ const MainContainer = () => {
     link.click();
     window.URL.revokeObjectURL(url);
   };
-
   const onDragEnd = (result) => {
     if (!result.destination) return;
     const { source, destination, draggableId } = result;
@@ -346,13 +351,31 @@ const MainContainer = () => {
     if (source.droppableId !== destination.droppableId) {
       let allItem = [...manageDetails.mainScreenDetails];
       let type = "";
-      if (draggableId === "1") {
-        type = "Image";
-      } else if (draggableId === "2") {
-        type = "Video";
-      } else if (draggableId === "3") {
-        type = "PDF";
-      } else {
+      switch (draggableId) {
+        case "1":
+          type = "Image";
+          break;
+        case "2":
+          type = "Video";
+          break;
+        case "3":
+          type = "PDF";
+          break;
+        case "4":
+          type = "Youtube";
+          break;
+        case "5":
+          type = "Gif";
+          break;
+        case "6":
+          type = "Ticker";
+          break;
+        case "7":
+          type = "";
+          break;
+        default:
+          type = "Image";
+          break;
       }
 
       let id = 1;
@@ -368,6 +391,22 @@ const MainContainer = () => {
         height: defaultHeight,
         width: defaultWidth,
       };
+
+      if (type === "Ticker") {
+        dragItem.tickerDetails = false;
+        dragItem.mainContain = "Change Text";
+        dragItem.width = "100%";
+        dragItem.height = "100%";
+        dragItem.direction = "left";
+        dragItem.behavior = "slide";
+        dragItem.scrollDelay = "1000";
+        dragItem.scrollAmount = "1000";
+        dragItem.loop = "infinite";
+        dragItem.backgroundColor = "#000";
+        dragItem.hspace = "";
+        dragItem.vspace = "";
+        dragItem.fontSize = "10";
+      }
       allItem.push({ ...dragItem });
 
       setManageDetails({
@@ -376,7 +415,6 @@ const MainContainer = () => {
       });
     }
   };
-
   const handleSaveXAndYAxis = (
     index,
     data = { distance: [], width: 0, height: 0 }
@@ -388,7 +426,44 @@ const MainContainer = () => {
       mainScreenDetails: dragScreen,
     });
   };
+  const handleAddTickerPropertiesPopup = () => {
+    let items = [...manageDetails.mainScreenDetails];
+    let id = manageDetails.tickerPopupId;
+    items[id].tickerDetails = true;
+    items[id].mainContain = manageDetails.ticker.mainContain;
+    items[id].width = manageDetails.ticker.width;
+    items[id].height = manageDetails.ticker.height;
+    items[id].direction = manageDetails.ticker.direction;
+    items[id].behavior = manageDetails.ticker.behavior;
+    items[id].scrollDelay = manageDetails.ticker.scrollDelay;
+    items[id].scrollAmount = manageDetails.ticker.scrollAmount;
+    items[id].loop = manageDetails.ticker.loop;
+    items[id].backgroundColor = manageDetails.ticker.backgroundColor;
+    items[id].hspace = manageDetails.ticker.hspace;
+    items[id].vspace = manageDetails.ticker.vspace;
+    items[id].fontSize = manageDetails.ticker.fontSize;
 
+    setManageDetails({
+      ...manageDetails,
+      tickerPropertiesPopup: false,
+      mainScreenDetails: items,
+    });
+  };
+  const handleTickerPopupManage = (index, key, value) => {
+    setManageDetails({
+      ...manageDetails,
+      [key]: value,
+      tickerPopupId: index,
+    });
+  };
+  const handleRemoveComponent = (componentId) => {
+    let details = [...manageDetails.mainScreenDetails];
+    let modifyDetail = details.filter((item) => item.id != componentId);
+    setManageDetails({
+      ...manageDetails,
+      mainScreenDetails: modifyDetail,
+    });
+  };
   useEffect(() => {
     setManageDetails({
       ...manageDetails,
@@ -410,6 +485,10 @@ const MainContainer = () => {
       handleManagePopup={handleManagePopup}
       onDragEnd={onDragEnd}
       handleSaveXAndYAxis={handleSaveXAndYAxis}
+      handleTickerOnChange={handleTickerOnChange}
+      handleAddTickerPropertiesPopup={handleAddTickerPropertiesPopup}
+      handleTickerPopupManage={handleTickerPopupManage}
+      handleRemoveComponent={handleRemoveComponent}
     />
   );
 };

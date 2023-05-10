@@ -1,4 +1,6 @@
 import React from "react";
+import ModeEditOutlineIcon from "@mui/icons-material/ModeEditOutline";
+import CloseIcon from "@mui/icons-material/Close";
 
 const Ticker = (props) => {
   const {
@@ -13,23 +15,36 @@ const Ticker = (props) => {
     backgroundColor,
     hspace,
     vspace,
+    style,
+    classInfo,
+    editOnClick,
+    closeOnClick,
   } = props;
 
   return (
-    <marquee
-      width={width}
-      height={height}
-      direction={direction}
-      behavior={behavior}
-      scrolldelay={scrollDelay}
-      scrollamount={scrollAmount}
-      loop={loop}
-      bgcolor={backgroundColor}
-      hspace={hspace}
-      vspace={vspace}
-    >
-      {mainContain}
-    </marquee>
+    <div className="marquee-main">
+      <ModeEditOutlineIcon
+        onClick={editOnClick}
+        className="marquee-edit-icon"
+      />
+      <marquee
+        width={width}
+        height={height}
+        direction={direction}
+        behavior={behavior}
+        scrolldelay={scrollDelay}
+        scrollamount={scrollAmount}
+        loop={loop}
+        bgcolor={backgroundColor}
+        hspace={hspace}
+        vspace={vspace}
+        style={style}
+        className={classInfo}
+      >
+        {mainContain}
+      </marquee>
+      <CloseIcon onClick={closeOnClick} className="marquee-close-icon" />
+    </div>
   );
 };
 
