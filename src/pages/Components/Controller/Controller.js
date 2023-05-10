@@ -2,6 +2,7 @@ import { Button } from "@mui/material";
 import React from "react";
 import HighlightOffIcon from "@mui/icons-material/HighlightOff";
 import { FileUploader } from "react-drag-drop-files";
+import CloseIcon from "@mui/icons-material/Close";
 
 const Controller = (props) => {
   const {
@@ -12,6 +13,7 @@ const Controller = (props) => {
     fileClass,
     handleControllerChange,
     handleControllerClear,
+    handleRemoveComponent,
   } = props;
 
   const handleUploadedContent = (TypesOfContent, handleClear) => {
@@ -29,7 +31,7 @@ const Controller = (props) => {
   };
   const handleFileUploadContent = (type, onChange, classDetails) => {
     return (
-      <div className="file-info">
+      <div className="file-info main-controller">
         <FileUploader
           handleChange={onChange}
           classes={classDetails}
@@ -42,12 +44,13 @@ const Controller = (props) => {
             width: "100%",
           }}
         />
+        <CloseIcon onClick={handleRemoveComponent} className="close-icon" />
       </div>
     );
   };
 
   return (
-    <div style={{ width: "100%", height: "100%" }} key={index}>
+    <div className="main-controller" key={index}>
       {controllerType.toLowerCase() === "image" && (
         <div className="file-image">
           {fileData
@@ -93,7 +96,20 @@ const Controller = (props) => {
               )}
         </div>
       )}
-      
+      {controllerType.toLowerCase() === "gif" && (
+        <div className="file-image">
+          {fileData
+            ? handleUploadedContent(
+                <img src={fileData} className="img-view" />,
+                handleControllerClear
+              )
+            : handleFileUploadContent(
+                acceptFiles,
+                handleControllerChange,
+                fileClass
+              )}
+        </div>
+      )}
     </div>
   );
 };

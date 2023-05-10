@@ -22,33 +22,40 @@ import GifIcon from "@mui/icons-material/Gif";
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 import YouTubeIcon from "@mui/icons-material/YouTube";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
+import NewspaperIcon from "@mui/icons-material/Newspaper";
+import ModeEditOutlineIcon from "@mui/icons-material/ModeEditOutline";
 import ModalContainer from "../Common/Modal/ModalPopupContainer";
-import { FileUploader } from "react-drag-drop-files";
-import HighlightOffIcon from "@mui/icons-material/HighlightOff";
 import { ZoomPan } from "react-zoom-pan/lib.cjs";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import Moveable from "react-moveable-fork";
 import ControllerContainer from "../Controller/ControllerContainer";
 import TickerContainer from "../Ticker/TickerContainer";
+import CloseIcon from "@mui/icons-material/Close";
 
-const Main = ({
-  manageDetails,
-  handleOnChange,
-  handleCreateResolution,
-  handleCreateMonitor,
-  handleOnChangeFile,
-  handleCreateRegions,
-  handleCreateXML,
-  handleManagePopup,
-  onDragEnd,
-  handleSaveXAndYAxis,
-}) => {
+const Main = (props) => {
+  const {
+    manageDetails,
+    handleOnChange,
+    handleCreateResolution,
+    handleCreateMonitor,
+    handleOnChangeFile,
+    handleCreateRegions,
+    handleCreateXML,
+    handleManagePopup,
+    onDragEnd,
+    handleSaveXAndYAxis,
+    handleTickerOnChange,
+    handleAddTickerPropertiesPopup,
+    handleTickerPopupManage,
+    handleRemoveComponent,
+  } = props;
+
   const imageTypes = ["JPEG", "PNG", "GIF", "JPG"];
   const videoTypes = ["MP4", "MOV", "MKV"];
   const pdfTypes = ["PDF"];
+  const gifType = ["GIF"];
   const zoomingContent = useRef();
   const moveableRef = useRef();
-  const videoRef = useRef(null);
 
   const handleResolutionPopupContent = () => {
     return (
@@ -109,6 +116,90 @@ const Main = ({
             value={manageDetails.screenMonitor2}
             onChange={(e) => handleOnChange(e.target.name, e.target.value)}
           />
+        </FormControl>
+      </>
+    );
+  };
+
+  const handleTickerPropertiesPopupContent = () => {
+    return (
+      <>
+        <FormControl fullWidth style={{ margin: "5px 0px" }}>
+          <TextField
+            id="outlined-basic"
+            variant="outlined"
+            name="mainContain"
+            label="please enter ticker text"
+            value={manageDetails.ticker.mainContain}
+            onChange={(e) =>
+              handleTickerOnChange(e.target.name, e.target.value)
+            }
+          />
+          <TextField
+            type="color"
+            id="outlined-basic"
+            variant="outlined"
+            name="backgroundColor"
+            label="please select ticker background color"
+            value={manageDetails.ticker.backgroundColor}
+            onChange={(e) =>
+              handleTickerOnChange(e.target.name, e.target.value)
+            }
+          />
+          <FormControl fullWidth>
+            <InputLabel id="direction-label">Direction</InputLabel>
+            <Select
+              labelId="direction-label"
+              id="direction-id"
+              value={manageDetails.ticker.direction}
+              onChange={(e) =>
+                handleTickerOnChange(e.target.name, e.target.value)
+              }
+              name={"direction"}
+            >
+              <MenuItem value={"left"}>Left</MenuItem>
+              <MenuItem value={"right"}>Right</MenuItem>
+              <MenuItem value={"up"}>Up</MenuItem>
+              <MenuItem value={"down"}>Down</MenuItem>
+            </Select>
+          </FormControl>
+          <FormControl fullWidth>
+            <InputLabel id="behavior-label">Behavior</InputLabel>
+            <Select
+              labelId="behavior-label"
+              id="behavior-id"
+              value={manageDetails.ticker.behavior}
+              onChange={(e) =>
+                handleTickerOnChange(e.target.name, e.target.value)
+              }
+              name={"behavior"}
+            >
+              <MenuItem value={"scroll"}>Scroll</MenuItem>
+              <MenuItem value={"slide"}>Slide</MenuItem>
+              <MenuItem value={"alternate"}>Alternate</MenuItem>
+            </Select>
+          </FormControl>
+          <FormControl fullWidth>
+            <InputLabel id="fontSize-label">Font Size</InputLabel>
+            <Select
+              labelId="fontSize-label"
+              id="fontSize-id"
+              value={manageDetails.ticker.fontSize}
+              onChange={(e) =>
+                handleTickerOnChange(e.target.name, e.target.value)
+              }
+              name={"fontSize"}
+            >
+              {[...Array(100)].map((_, index) => {
+                let id = index + 1;
+                return (
+                  <MenuItem key={id} value={id}>
+                    {id}
+                  </MenuItem>
+                );
+              })}
+            </Select>
+          </FormControl>
         </FormControl>
       </>
     );
@@ -431,6 +522,25 @@ const Main = ({
                               );
                             }}
                           </Draggable>
+                          <Draggable key={6} draggableId={"6"} index={6}>
+                            {(provided, snapshot) => {
+                              return (
+                                <Box
+                                  ref={provided.innerRef}
+                                  {...provided.draggableProps}
+                                  {...provided.dragHandleProps}
+                                >
+                                  <Box
+                                    dragging={snapshot.isDragging}
+                                    className="file-info"
+                                  >
+                                    <NewspaperIcon />
+                                    Ticker
+                                  </Box>
+                                </Box>
+                              );
+                            }}
+                          </Draggable>
                         </Box>
                         {provided.placeholder}
                       </Box>
@@ -562,6 +672,11 @@ const Main = ({
                                                       "Image"
                                                     )
                                                   }
+                                                  handleRemoveComponent={() =>
+                                                    handleRemoveComponent(
+                                                      info.id
+                                                    )
+                                                  }
                                                 />
                                               )}
                                               {info.content.toLowerCase() ===
@@ -594,6 +709,11 @@ const Main = ({
                                                       index,
                                                       "clear",
                                                       "Video"
+                                                    )
+                                                  }
+                                                  handleRemoveComponent={() =>
+                                                    handleRemoveComponent(
+                                                      info.id
                                                     )
                                                   }
                                                 />
@@ -629,25 +749,120 @@ const Main = ({
                                                       "PDF"
                                                     )
                                                   }
+                                                  handleRemoveComponent={() =>
+                                                    handleRemoveComponent(
+                                                      info.id
+                                                    )
+                                                  }
+                                                />
+                                              )}
+                                              {info.content.toLowerCase() ===
+                                                "gif" && (
+                                                <ControllerContainer
+                                                  index={index}
+                                                  fileData={
+                                                    manageDetails
+                                                      .mainScreenDetails[index]
+                                                      ?.fileObj
+                                                  }
+                                                  controllerType={"gif"}
+                                                  acceptFiles={gifType}
+                                                  fileClass={
+                                                    "fileUp gif-upload" + index
+                                                  }
+                                                  label="gif Upload"
+                                                  handleControllerChange={(e) =>
+                                                    handleOnChangeFile(
+                                                      e,
+                                                      index,
+                                                      "upload",
+                                                      "Gif"
+                                                    )
+                                                  }
+                                                  handleControllerClear={() =>
+                                                    handleOnChangeFile(
+                                                      "",
+                                                      index,
+                                                      "clear",
+                                                      "Gif"
+                                                    )
+                                                  }
+                                                  handleRemoveComponent={() =>
+                                                    handleRemoveComponent(
+                                                      info.id
+                                                    )
+                                                  }
                                                 />
                                               )}
                                               {info.content.toLowerCase() ===
                                                 "ticker" && (
-                                                <TickerContainer
-                                                  mainContain={"Change Text"}
-                                                  width={width}
-                                                  height={height}
-                                                  direction={direction}
-                                                  behavior={behavior}
-                                                  scrollDelay={scrollDelay}
-                                                  scrollAmount={scrollAmount}
-                                                  loop={loop}
-                                                  backgroundColor={
-                                                    backgroundColor
-                                                  }
-                                                  hspace={hspace}
-                                                  vspace={vspace}
-                                                />
+                                                <>
+                                                  {info.tickerDetails ? (
+                                                    <TickerContainer
+                                                      mainContain={
+                                                        info.mainContain
+                                                      }
+                                                      width={info.width}
+                                                      height={info.height}
+                                                      direction={info.direction}
+                                                      behavior={info.behavior}
+                                                      scrollDelay={
+                                                        info.scrollDelay
+                                                      }
+                                                      scrollAmount={
+                                                        info.scrollAmount
+                                                      }
+                                                      loop={info.loop}
+                                                      backgroundColor={
+                                                        "transparent"
+                                                      }
+                                                      hspace={info.hspace}
+                                                      vspace={info.vspace}
+                                                      closeOnClick={() =>
+                                                        handleRemoveComponent(
+                                                          info.id
+                                                        )
+                                                      }
+                                                      editOnClick={() =>
+                                                        handleTickerPopupManage(
+                                                          index,
+                                                          "tickerPropertiesPopup",
+                                                          !manageDetails.tickerPropertiesPopup
+                                                        )
+                                                      }
+                                                      style={{
+                                                        fontSize: info.fontSize,
+                                                        color:
+                                                          info.backgroundColor,
+                                                      }}
+                                                      classInfo={"marquee-text"}
+                                                    />
+                                                  ) : (
+                                                    <div className="marquee-uploader-main">
+                                                      <div
+                                                        className="marquee-content-info"
+                                                        onClick={() =>
+                                                          handleTickerPopupManage(
+                                                            index,
+                                                            "tickerPropertiesPopup",
+                                                            !manageDetails.tickerPropertiesPopup
+                                                          )
+                                                        }
+                                                      >
+                                                        <ModeEditOutlineIcon />
+                                                        Ticker
+                                                      </div>
+                                                      <CloseIcon
+                                                        className="marquee-close-icon"
+                                                        onClick={() =>
+                                                          handleRemoveComponent(
+                                                            info.id
+                                                          )
+                                                        }
+                                                      />
+                                                    </div>
+                                                  )}
+                                                </>
                                               )}
                                             </div>
                                           </React.Fragment>
@@ -827,6 +1042,27 @@ const Main = ({
             handleManagePopup(
               "monitorTypePopup",
               !manageDetails.monitorTypePopup
+            )
+          }
+        />
+        <ModalContainer
+          modelKey={"tickerPropertiesPopup"}
+          modalOpen={manageDetails.tickerPropertiesPopup}
+          modalClose={() =>
+            handleManagePopup(
+              "tickerPropertiesPopup",
+              !manageDetails.tickerPropertiesPopup
+            )
+          }
+          modalTitle={"Manage ticker properties"}
+          modalContent={handleTickerPropertiesPopupContent()}
+          modalFirstBtnTitle={"Add Properties"}
+          modalFirstMethod={() => handleAddTickerPropertiesPopup()}
+          modalSecondBtnTitle={"Cancel"}
+          modalSecondMethod={() =>
+            handleManagePopup(
+              "tickerPropertiesPopup",
+              !manageDetails.tickerPropertiesPopup
             )
           }
         />
