@@ -218,6 +218,23 @@ const Main = (props) => {
     }
   }, []);
 
+  useEffect(() => {
+    const viewPanId = document.getElementById("viewport");
+    const firstDiv = viewPanId?.getElementsByTagName("div")[0];
+    if (firstDiv) {
+      let totalResolution =
+        manageDetails.resolution.height + manageDetails.resolution.width;
+      var matrix = "";
+      if (totalResolution >= 3000) {
+        matrix = "matrix(0.5, 0, 0, 0.5, 120, 120)";
+      } else if (manageDetails.resolution) {
+        matrix = "matrix(0.25, 0, 0, 0.25, 100, 150)";
+      } else {
+      }
+      firstDiv.style.transform = matrix;
+    }
+  }, [manageDetails.createRegions]);
+
   return (
     <Grid
       container
@@ -550,15 +567,15 @@ const Main = (props) => {
               </Grid>
               <Box className="zooming-content">
                 {/* *******************************  EDITOR SECTION START HERE  ********************************* */}
-                {manageDetails.createRegions && (
-                  <div
-                    ref={zoomingContent}
-                    style={{
-                      backgroundColor: "#c4c4c4e3",
-                      height: "100%",
-                      width: "100%",
-                    }}
-                  >
+                <div
+                  ref={zoomingContent}
+                  style={{
+                    backgroundColor: "#c4c4c4e3",
+                    height: "100%",
+                    width: "100%",
+                  }}
+                >
+                  {manageDetails.createRegions && (
                     <ZoomPan>
                       <div x={0} y={0} h={0} w={0} className="chickenyu"></div>
                       <div
@@ -910,8 +927,8 @@ const Main = (props) => {
                         </Droppable>
                       </div>
                     </ZoomPan>
-                  </div>
-                )}
+                  )}
+                </div>
               </Box>
             </Grid>
             <Grid
