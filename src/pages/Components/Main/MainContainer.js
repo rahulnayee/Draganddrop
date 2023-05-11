@@ -154,29 +154,8 @@ const MainContainer = () => {
       manageDetails.resolution &&
       manageDetails.angle
     ) {
-      // let mainScreenDetails = []; // [...manageDetails.mainScreenDetails];
-      // let count = manageDetails.monitorType.filter(
-      //   (item) => item.title === manageDetails.monitor.title
-      // );
-      // if (count.length > 0) {
-      //   for (let index = 0; index < count[0].totalScreen; index++) {
-      //     mainScreenDetails.push({
-      //       id: index,
-      //       fileObj: null,
-      //       drop: false,
-      //     });
-      //   }
-      // } else {
-      //   mainScreenDetails.push({
-      //     id: 1,
-      //     fileObj: null,
-      //     drop: false,
-      //   });
-      // }
-
       setManageDetails({
         ...manageDetails,
-        // mainScreenDetails: mainScreenDetails,
         createRegions: true,
       });
     } else {
